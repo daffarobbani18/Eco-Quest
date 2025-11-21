@@ -109,7 +109,7 @@ Assets/
 | Nama | Peran | GitHub |
 |------|------|--------|
 | Daffa Robbani | Game Programmer & Designer | https://github.com/daffarobbani18 |
-| Athallah Budiman Devia Putra | Artist & Assistant Dev | https://github.com/athalbudi |
+| Athallah Budiman Devia Putra | Game Programmer & Designer | https://github.com/athalbudi |
 
 ---
 
