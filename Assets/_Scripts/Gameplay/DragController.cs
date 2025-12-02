@@ -1,0 +1,104 @@
+using UnityEngine;
+
+public class DragController : MonoBehaviour
+{
+    private bool isDragging = false;
+    private ConveyorMovement movementScript;
+    private Rigidbody2D rb;
+    private Vector3 startPosition; // Posisi awal sebelum di-drag
+
+    void Start()
+    {
+        movementScript = GetComponent<ConveyorMovement>();
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    void OnMouseDown()
+    {
+        isDragging = true;
+        startPosition = transform.position; // Ingat posisi kalau-kalau player batal buang
+
+        if (movementScript != null) movementScript.enabled = false;
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.velocity = Vector2.zero;
+        }
+    }
+
+    void OnMouseDrag()
+    {
+        if (isDragging)
+        {
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = 10f;
+            Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
+            transform.position = worldPos;
+        }
+    }
+
+    void OnMouseUp()
+    {
+        isDragging = false;
+        CheckDropTarget(); // Cek kita jatuh di mana?
+    }
+
+    void CheckDropTarget()
+    {
+        // Tembakkan sinar laser kecil di posisi sampah berada sekarang
+        // untuk melihat apakah ada benda lain di situ (seperti Tong Sampah)
+        Collider2D[] hits = Physics2D.OverlapPointAll(transform.position);
+
+        bool foundBin = false;
+
+        foreach (Collider2D hit in hits)
+        {
+            // Apakah benda yang kena itu punya script 'BinController'?
+            BinController bin = hit.GetComponent<BinController>();
+
+            if (bin != null)
+            {
+                foundBin = true;
+                ProsesPemilahan(bin); // Jalankan logika penilaian
+                break; // Keluar loop, kita sudah nemu tong
+            }
+        }
+
+        // Kalau dilepas bukan di atas tong, kembalikan ke ban berjalan?
+        // Atau biarkan jatuh? Untuk sekarang kita biarkan saja dia diam di sana
+        // atau Anda bisa aktifkan lagi movementScript-nya.
+        if (!foundBin)
+        {
+            // Opsional: Balik lagi jalan kalau tidak kena tong
+            // if (movementScript != null) movementScript.enabled = true;
+        }
+    }
+
+    void ProsesPemilahan(BinController bin)
+    {
+        // Ambil data sampah dari script WasteItem di diri sendiri
+        WasteItem myItem = GetComponent<WasteItem>();
+
+        if (myItem != null && myItem.dataSampah != null)
+        {
+            // BANDINGKAN: Tipe Sampah SAYA vs Tipe Tong ITU
+            if (myItem.dataSampah.tipeSampah == bin.tipeTongIni)
+            {
+                Debug.Log("BENAR! +10 Poin");
+                // TODO: Panggil GameManager.Instance.TambahSkor(10);
+
+                // Efek visual sukses bisa ditaruh sini
+            }
+            else
+            {
+                Debug.Log("SALAH! -5 Poin");
+                // TODO: Panggil GameManager.Instance.KurangiSkor(5);
+
+                // Efek visual salah bisa ditaruh sini
+            }
+        }
+
+        // Hancurkan sampah setelah dimasukkan
+        Destroy(gameObject);
+    }
+}
