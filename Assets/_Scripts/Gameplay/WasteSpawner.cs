@@ -10,74 +10,76 @@ public class WasteSpawner : MonoBehaviour
 
     [Header("Data Test (Isi minimal 3 data beda)")]
     public List<WasteData> daftarSampahTest;
+    private List<WasteData> daftarSampahFinal;
 
     private float timer;
     private int indexSampah = 0;
+
+    void Start()
+    {
+        // --- LOGIKA PEMILIHAN DATA ---
+        // 1. Cek apakah ada data kiriman dari Fase 1 (GameManager)?
+        if (GameManager.Instance != null && GameManager.Instance.trashInventory.Count > 0)
+        {
+            Debug.Log("Spawner: Menggunakan Data dari Inventaris Pemain (Fase 1).");
+            // Salin isi inventory ke list lokal kita agar aman
+            daftarSampahFinal = new List<WasteData>(GameManager.Instance.trashInventory);
+        }
+        else
+        {
+            Debug.LogWarning("Spawner: Tidak ada data inventaris. Menggunakan DATA TEST INSPECTOR.");
+            daftarSampahFinal = daftarSampahTest;
+        }
+
+        // Mulai logika game level (Timer dll)
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.MulaiLevel(60f);
+        }
+    }
 
     void Update()
     {
         timer += Time.deltaTime;
 
-        if (timer >= intervalSpawn)
+        // Cek daftarSampahFinal, bukan daftarSampahTest lagi
+        if (daftarSampahFinal != null && daftarSampahFinal.Count > 0)
         {
-            SpawnSampah();
-            timer = 0f; // Reset timer
+            if (timer >= intervalSpawn)
+            {
+                SpawnSampah();
+                timer = 0f;
+            }
         }
     }
 
     void SpawnSampah()
     {
-        // Cek keamanan data
-        if (daftarSampahTest == null || daftarSampahTest.Count == 0)
+        // Pastikan kita tidak mencoba spawn lebih dari jumlah sampah yang ada
+        if (indexSampah < daftarSampahFinal.Count)
         {
-            Debug.LogError("ERROR: Daftar Sampah Test di Inspector KOSONG!");
-            return;
-        }
+            // Ambil Data dari List FINAL
+            WasteData dataSekarang = daftarSampahFinal[indexSampah];
 
-        // 1. Reset index jika sudah habis
-        if (indexSampah >= daftarSampahTest.Count) indexSampah = 0;
+            if (dataSekarang.iconSampah == null) return;
 
-        // 2. Ambil Data Giliran Ini
-        WasteData dataSekarang = daftarSampahTest[indexSampah];
+            // Instantiate & Setup (Sama seperti sebelumnya)
+            GameObject sampahBaru = Instantiate(prefabSampah, titikSpawn.position, Quaternion.identity);
+            sampahBaru.name = "Sampah_" + dataSekarang.namaSampah;
 
-        // ---------------------------------------------------------
-        // DEBUG 1: Pastikan datanya punya gambar
-        if (dataSekarang.iconSampah == null)
-        {
-            Debug.LogError("ERROR FATAL: Data " + dataSekarang.namaSampah + " TIDAK PUNYA GAMBAR (Sprite) di file datanya!");
-            return;
-        }
-        // ---------------------------------------------------------
+            WasteItem scriptSampah = sampahBaru.GetComponent<WasteItem>();
+            if (scriptSampah != null) scriptSampah.dataSampah = dataSekarang;
 
-        // 3. Lahirkan Sampah (Instantiate)
-        GameObject sampahBaru = Instantiate(prefabSampah, titikSpawn.position, Quaternion.identity);
+            SpriteRenderer renderGambar = sampahBaru.GetComponentInChildren<SpriteRenderer>();
+            if (renderGambar != null) renderGambar.sprite = dataSekarang.iconSampah;
 
-        // Beri nama unik biar gampang dicek di Hierarchy
-        sampahBaru.name = "Sampah_" + dataSekarang.namaSampah;
-
-        // 4. Masukkan Data ke Script WasteItem
-        WasteItem scriptSampah = sampahBaru.GetComponent<WasteItem>();
-        if (scriptSampah != null)
-        {
-            scriptSampah.dataSampah = dataSekarang;
-        }
-
-        // 5. GANTI GAMBAR (MOMEN KEBENARAN)
-        SpriteRenderer renderGambar = sampahBaru.GetComponent<SpriteRenderer>();
-        if (renderGambar != null)
-        {
-            // Kita paksa ganti spritenya dengan yang ada di data
-            renderGambar.sprite = dataSekarang.iconSampah;
-
-            Debug.Log("Spawner mencoba memasang gambar bernama: " + dataSekarang.iconSampah.name);
-            Debug.Log("SUKSES: Munculkan " + dataSekarang.namaSampah);
+            indexSampah++; // Lanjut ke item berikutnya
         }
         else
         {
-            Debug.LogError("ERROR: Prefab tidak punya komponen Sprite Renderer!");
+            // Jika index sudah habis (semua sampah sudah keluar)
+            Debug.Log("Semua sampah sudah keluar dari meja!");
+            // Di sini nanti kita bisa set state "Menunggu Selesai"
         }
-
-        // 6. Lanjut antrian
-        indexSampah++;
     }
 }

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fa1b3b501f4810f41868c196a5e3fd79
+guid: 462efa7bbbfccba4293a3144a20e5cd0
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -43,13 +43,13 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 9
-  spritePivot: {x: 0.13908228, y: 0.6242957}
-  spritePixelsToUnits: 900
-  spriteBorder: {x: 6121, y: 1611, z: 1404, w: 957}
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -108,18 +108,84 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Dialog New_0
+      rect:
+        serializedVersion: 2
+        x: 5030
+        y: 134
+        width: 946
+        height: 1339
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b168c68108edfb74bb4df754c03a8018
+      internalID: 1143967940
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialog New_1
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 3382
+        width: 1191
+        height: 722
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6136fb03bf1f544099044ebb67616dc
+      internalID: 1523418818
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dialog New_2
+      rect:
+        serializedVersion: 2
+        x: 2054
+        y: 3436
+        width: 1176
+        height: 623
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fac271182c09d9041b85dc1895ce0d98
+      internalID: -156694731
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Dialog New_0: 1143967940
+      Dialog New_1: 1523418818
+      Dialog New_2: -156694731
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

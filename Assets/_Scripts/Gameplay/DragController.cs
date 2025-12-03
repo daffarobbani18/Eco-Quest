@@ -76,29 +76,23 @@ public class DragController : MonoBehaviour
 
     void ProsesPemilahan(BinController bin)
     {
-        // Ambil data sampah dari script WasteItem di diri sendiri
         WasteItem myItem = GetComponent<WasteItem>();
 
         if (myItem != null && myItem.dataSampah != null)
         {
-            // BANDINGKAN: Tipe Sampah SAYA vs Tipe Tong ITU
             if (myItem.dataSampah.tipeSampah == bin.tipeTongIni)
             {
-                Debug.Log("BENAR! +10 Poin");
-                // TODO: Panggil GameManager.Instance.TambahSkor(10);
-
-                // Efek visual sukses bisa ditaruh sini
+                Debug.Log("BENAR!");
+                // PANGGIL GAMEMANAGER:
+                GameManager.Instance.TambahSkor(10);
             }
             else
             {
-                Debug.Log("SALAH! -5 Poin");
-                // TODO: Panggil GameManager.Instance.KurangiSkor(5);
-
-                // Efek visual salah bisa ditaruh sini
+                Debug.Log("SALAH!");
+                // PANGGIL GAMEMANAGER:
+                GameManager.Instance.KurangiSkor(5);
             }
         }
-
-        // Hancurkan sampah setelah dimasukkan
         Destroy(gameObject);
     }
 }
