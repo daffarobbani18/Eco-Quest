@@ -12,14 +12,14 @@ public class BinController : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         // 1. Cek apakah benda yang masuk itu adalah Sampah?
-        // Kita cek apakah dia punya script 'CollectionItem' yang memegang data sampah
-        CollectionItem scriptSampah = other.GetComponent<CollectionItem>();
+        // Kita cek apakah dia punya script 'WasteItem' yang memegang data sampah
+        WasteItem scriptSampah = other.GetComponent<WasteItem>();
 
         // Jika scriptnya ditemukan (berarti itu memang sampah)
         if (scriptSampah != null)
         {
             // Ambil data jenis sampahnya
-            WasteData dataMasuk = scriptSampah.dataSampahIni;
+            WasteData dataMasuk = scriptSampah.dataSampah;
 
             // 2. BANDINGKAN: Apakah jenis sampah SAMA dengan jenis tong ini?
             if (dataMasuk.tipeSampah == tipeTongIni)

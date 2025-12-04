@@ -79,15 +79,18 @@ public class CollectionItem : MonoBehaviour
 
     void MasukKeTas()
     {
+        // Masukkan sampah ke inventory GameManager (dibawa ke Scene 03)
         if (GameManager.Instance != null)
         {
             GameManager.Instance.AddTrashToInventory(dataSampahIni);
-            GameManager.Instance.KurangiJumlahSampah();
         }
+        
+        // Laporkan ke CollectionLevelManager lokal Scene 02
         if (CollectionLevelManager.Instance != null)
         {
             CollectionLevelManager.Instance.LaporSampahTerambil();
         }
+        
         Destroy(gameObject);
     }
 }

@@ -84,13 +84,20 @@ public class DragController : MonoBehaviour
             {
                 Debug.Log("BENAR!");
                 // PANGGIL GAMEMANAGER:
-                GameManager.Instance.TambahSkor(10);
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.TambahSkor(10);
+                    GameManager.Instance.KurangiJumlahSampah(); // Kurangi counter target
+                }
             }
             else
             {
                 Debug.Log("SALAH!");
                 // PANGGIL GAMEMANAGER:
-                GameManager.Instance.KurangiSkor(5);
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.KurangiSkor(5);
+                }
             }
         }
         Destroy(gameObject);
