@@ -12,6 +12,13 @@ public class WasteData : ScriptableObject // PERHATIKAN: Kita ganti 'MonoBehavio
 
     [Header("Visual")]
     public Sprite iconSampah; // Tempat menaruh gambar sprite sampahnya
+
+    [Header("Scoring (Scene 03 - Pemilahan)")]
+    [Tooltip("Skor yang didapat jika sampah dibuang ke tong yang BENAR")]
+    public int skorBenar = 10;
+    
+    [Tooltip("Skor yang dikurangi jika sampah dibuang ke tong yang SALAH (gunakan angka positif, misal 5 untuk -5)")]
+    public int skorSalah = 5;
 }
 
 // Ini adalah definisi pilihan ganda untuk tipe sampah.

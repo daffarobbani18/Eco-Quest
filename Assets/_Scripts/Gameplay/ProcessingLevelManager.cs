@@ -67,8 +67,11 @@ public class ProcessingLevelManager : MonoBehaviour
         // Matikan Spawner Awal
         if (mesinSpawner != null) mesinSpawner.enabled = false;
 
-        // Cek apakah ada briefing
-        bool adaBriefing = (briefingScript != null && dataLevelIni != null && dataLevelIni.barisDialogSortir.Length > 0);
+        // Cek apakah ada briefing (dengan null check lengkap)
+        bool adaBriefing = (briefingScript != null && 
+                           dataLevelIni != null && 
+                           dataLevelIni.barisDialogSortir != null && 
+                           dataLevelIni.barisDialogSortir.Length > 0);
 
         if (adaBriefing)
         {

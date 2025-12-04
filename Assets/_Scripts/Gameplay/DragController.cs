@@ -82,21 +82,21 @@ public class DragController : MonoBehaviour
         {
             if (myItem.dataSampah.tipeSampah == bin.tipeTongIni)
             {
-                Debug.Log("BENAR!");
+                Debug.Log("BENAR! +" + myItem.dataSampah.skorBenar + " poin");
                 // PANGGIL GAMEMANAGER:
                 if (GameManager.Instance != null)
                 {
-                    GameManager.Instance.TambahSkor(10);
+                    GameManager.Instance.TambahSkor(myItem.dataSampah.skorBenar);
                     GameManager.Instance.KurangiJumlahSampah(); // Kurangi counter target
                 }
             }
             else
             {
-                Debug.Log("SALAH!");
+                Debug.Log("SALAH! -" + myItem.dataSampah.skorSalah + " poin");
                 // PANGGIL GAMEMANAGER:
                 if (GameManager.Instance != null)
                 {
-                    GameManager.Instance.KurangiSkor(5);
+                    GameManager.Instance.KurangiSkor(myItem.dataSampah.skorSalah);
                 }
             }
         }

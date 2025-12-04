@@ -25,11 +25,11 @@ public class BinController : MonoBehaviour
             if (dataMasuk.tipeSampah == tipeTongIni)
             {
                 // --- JIKA BENAR ---
-                Debug.Log("BENAR! " + dataMasuk.namaSampah + " masuk ke tong yang pas.");
+                Debug.Log("BENAR! " + dataMasuk.namaSampah + " masuk ke tong yang pas. +" + dataMasuk.skorBenar + " poin");
 
                 if (GameManager.Instance != null)
                 {
-                    GameManager.Instance.TambahSkor(10);        // Nambah Skor
+                    GameManager.Instance.TambahSkor(dataMasuk.skorBenar);        // Nambah Skor (dari data)
                     GameManager.Instance.KurangiJumlahSampah(); // Kurangi Target Sisa
                 }
 
@@ -39,11 +39,11 @@ public class BinController : MonoBehaviour
             else
             {
                 // --- JIKA SALAH ---
-                Debug.Log("SALAH! " + dataMasuk.namaSampah + " jangan dibuang di sini!");
+                Debug.Log("SALAH! " + dataMasuk.namaSampah + " jangan dibuang di sini! -" + dataMasuk.skorSalah + " poin");
 
                 if (GameManager.Instance != null)
                 {
-                    GameManager.Instance.KurangiSkor(5); // Hukuman kurangi nilai
+                    GameManager.Instance.KurangiSkor(dataMasuk.skorSalah); // Hukuman kurangi nilai (dari data)
                     // Sampah TIDAK dihancurkan, biar pemain mindahin ke tong lain
                     // Atau bisa juga dikasih efek mental (bepending sistem drag kamu)
                 }
