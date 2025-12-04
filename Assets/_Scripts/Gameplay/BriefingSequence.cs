@@ -132,7 +132,32 @@ public class BriefingSequence : MonoBehaviour
         if (tombolMulai != null)
         {
             tombolMulai.gameObject.SetActive(true);
+            
+            // Setup event tombol Mulai
+            tombolMulai.onClick.RemoveAllListeners();
+            tombolMulai.onClick.AddListener(OnTombolMulaiDiklik);
+            
             Debug.Log("[BRIEFING] Tombol Mulai Dimunculkan.");
+        }
+    }
+
+    // Fungsi yang dipanggil saat tombol "Mulai" diklik
+    void OnTombolMulaiDiklik()
+    {
+        Debug.Log("[BRIEFING] Tombol Mulai diklik! Memulai game...");
+        
+        // Tutup semua panel briefing
+        if (panelIntro != null) panelIntro.SetActive(false);
+        if (panelDialog != null) panelDialog.SetActive(false);
+        
+        // Panggil MulaiMain di CollectionLevelManager
+        if (CollectionLevelManager.Instance != null)
+        {
+            CollectionLevelManager.Instance.MulaiMain();
+        }
+        else
+        {
+            Debug.LogWarning("[BRIEFING] CollectionLevelManager.Instance NULL! Game tidak bisa dimulai.");
         }
     }
 }

@@ -25,21 +25,6 @@ MonoBehaviour:
   - Pilah ke tong Hijau (Organik), Kuning (Anorganik), atau B3. Jangan sampai salah
     atau jatuh ke lantai!
   - Siap? Waktu terus berjalan!
-  batasWaktuDetik: 60
-  targetJumlahSampah: 15
-  daftarSampahLevelIni:
-  - {fileID: 11400000, guid: ea2009ec863711241b519be5145a7cbb, type: 2}
-  - {fileID: 11400000, guid: 647656334d99b0a45a8f491ce2ca9e2f, type: 2}
-  - {fileID: 11400000, guid: b8ab58722d884834f868b09b62fdecce, type: 2}
-  - {fileID: 11400000, guid: 21ca879036eedcf40aca18a623d075a4, type: 2}
-  - {fileID: 11400000, guid: 883d65169b51d6d4da1ac958f268a034, type: 2}
-  - {fileID: 11400000, guid: 1ccdba07698b1cb4fab089d4cab748a2, type: 2}
-  - {fileID: 11400000, guid: 4bd9b8b2f5074d4438c47611057af94b, type: 2}
-  - {fileID: 11400000, guid: b51712d5341f5354a869e2a520a5427b, type: 2}
-  - {fileID: 11400000, guid: 07c0bb5358fbf5043ae005519c06c597, type: 2}
-  - {fileID: 11400000, guid: 4d0d6ec71ddf1ad4b886d6d5034a69ec, type: 2}
-  - {fileID: 11400000, guid: 64cda135eaad60e4b8ce31a230e60624, type: 2}
-  - {fileID: 11400000, guid: d121d663a73b891488f4ae32cdcef8ee, type: 2}
-  - {fileID: 11400000, guid: f32e064c1cfcb3947a4aeb96a2dfb0b1, type: 2}
-  - {fileID: 11400000, guid: ba31aa957d8b992448c63c28f375da2e, type: 2}
-  - {fileID: 11400000, guid: eb8903cd96da5d940a1c1931eabc93e3, type: 2}
+  batasWaktuDetik: 0
+  targetJumlahSampah: 12
+  daftarSampahLevelIni: []

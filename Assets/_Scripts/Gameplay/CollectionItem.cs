@@ -26,21 +26,43 @@ public class CollectionItem : MonoBehaviour
         }
         else
         {
-            Debug.LogError("ERROR: Tidak ketemu objek Tag 'Wadah'!");
+            Debug.LogWarning("⚠️ Tidak ada objek Tag 'Wadah'. Sampah akan langsung masuk tanpa animasi terbang.");
+            // Set posisi default di atas layar
+            targetWadah = null;
         }
     }
 
     void OnMouseDown()
     {
         // CEK STATUS: Hanya boleh diklik jika game sedang playing (Briefing sudah tutup)
-        if (CollectionLevelManager.Instance != null && !CollectionLevelManager.Instance.isGamePlaying)
+        if (CollectionLevelManager.Instance == null)
         {
+            Debug.LogError("❌ CollectionLevelManager.Instance NULL! Pastikan ada GameObject LevelManager di scene.");
+            return;
+        }
+        
+        if (!CollectionLevelManager.Instance.isGamePlaying)
+        {
+            Debug.Log("⏸️ Game belum dimulai. Klik tombol 'Mulai' dulu!");
             return; // Jangan lakukan apa-apa
         }
 
-        if (!isCollected && targetWadah != null)
+        if (!isCollected)
         {
-            MulaiTerbang();
+            Debug.Log($"✅ {gameObject.name} diklik! Mengumpulkan sampah...");
+            if (targetWadah != null)
+            {
+                MulaiTerbang();
+            }
+            else
+            {
+                // Langsung masuk tanpa animasi
+                MasukKeTas();
+            }
+        }
+        else if (isCollected)
+        {
+            Debug.Log("⚠️ Sampah ini sudah diklik sebelumnya.");
         }
     }
 
