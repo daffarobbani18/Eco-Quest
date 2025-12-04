@@ -535,61 +535,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &246679273
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 246679275}
-  - component: {fileID: 246679274}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &246679274
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 246679273}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 509b8a064796bab4fb971e998f324edc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  levelPakaiTimer: 1
-  totalSampahLevelIni: 12
-  winPanel: {fileID: 1751812990}
-  textSkorAkhir: {fileID: 1462212525}
-  textWaktuAkhir: {fileID: 2019076791}
-  scoreTextUI: {fileID: 1110529350}
-  timerTextUI: {fileID: 1879941236}
-  totalSkor: 0
-  sisaWaktu: 60
-  isGameActive: 0
-  trashInventory: []
---- !u!4 &246679275
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 246679273}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.8129171, y: 1.113429, z: 0.0018181631}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &296709975
 GameObject:
   m_ObjectHideFlags: 0
@@ -1070,7 +1015,7 @@ MonoBehaviour:
   panelIntro: {fileID: 691861287}
   textJudul: {fileID: 691861286}
   textInfo: {fileID: 691861285}
-  durasiAnimasi: 3
+  durasiAnimasi: 2
   panelDialog: {fileID: 1352064497}
   textDialogIsi: {fileID: 1284018233}
   tombolNext: {fileID: 1352064495}
@@ -1090,6 +1035,9 @@ MonoBehaviour:
   mesinSpawner: {fileID: 2145313692}
   briefingScript: {fileID: 452329881}
   dataLevelIni: {fileID: 11400000, guid: 268d62b9f2b5ead4ea06a2b5b851672e, type: 2}
+  panelWinScene2: {fileID: 1751812990}
+  textSkorAkhirScene2: {fileID: 1462212525}
+  textWaktuAkhirScene2: {fileID: 2019076791}
 --- !u!4 &452329883
 Transform:
   m_ObjectHideFlags: 0
@@ -1932,7 +1880,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 2
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
@@ -1941,7 +1893,7 @@ PrefabInstance:
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 452329882}
+      objectReference: {fileID: 1352064497}
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_Target
       value: 
@@ -1952,7 +1904,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: MulaiMain
+      value: SetActive
       objectReference: {fileID: 0}
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
@@ -1960,7 +1912,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ProcessingLevelManager, Assembly-CSharp
+      value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 1618376236571546633, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
@@ -3105,10 +3057,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelPakaiTimer: 1
-  totalSampahLevelIni: 0
-  winPanel: {fileID: 0}
-  textSkorAkhir: {fileID: 0}
-  textWaktuAkhir: {fileID: 0}
+  totalSampahLevelIni: 12
+  winPanel: {fileID: 1751812990}
+  textSkorAkhir: {fileID: 1462212525}
+  textWaktuAkhir: {fileID: 2019076791}
   scoreTextUI: {fileID: 1110529350}
   timerTextUI: {fileID: 1879941236}
   totalSkor: 0
@@ -3370,4 +3322,3 @@ SceneRoots:
   - {fileID: 1585420489}
   - {fileID: 1922333412}
   - {fileID: 452329883}
-  - {fileID: 246679275}

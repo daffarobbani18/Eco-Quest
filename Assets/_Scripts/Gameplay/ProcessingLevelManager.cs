@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
+using System.Collections; // Wajib ada untuk IEnumerator
 
 public class ProcessingLevelManager : MonoBehaviour
 {
@@ -13,87 +15,98 @@ public class ProcessingLevelManager : MonoBehaviour
     [Header("Data Level")]
     public LevelData dataLevelIni;
 
+    [Header("UI Scene Ini (Wajib Diisi di Inspector)")]
+    public GameObject panelWinScene2;
+    public TMP_Text textSkorAkhirScene2;
+    public TMP_Text textWaktuAkhirScene2;
+
     void Awake()
     {
         Instance = this;
     }
 
-    void Start()
+    // UBAH void Start() MENJADI IEnumerator Start()
+    IEnumerator Start()
     {
         Debug.Log("==================================================");
-        Debug.Log("[1] ProcessingLevelManager: START dimulai.");
+        Debug.Log("[1] ProcessingLevelManager: Menunggu GameManager siap...");
 
-        // CEK REFERENSI DI INSPECTOR
-        if (mesinSpawner == null) Debug.LogError("[ERROR] Mesin Spawner belum dimasukkan di Inspector!");
-        if (briefingScript == null) Debug.LogError("[ERROR] Briefing Script belum dimasukkan di Inspector!");
-        if (dataLevelIni == null) Debug.LogError("[ERROR] Data Level (Scriptable Object) belum dimasukkan di Inspector!");
+        // 1. JEDA SEJENAK (PENTING!)
+        // Memberi waktu agar GameManager dari Scene 1 mendarat sempurna di Scene 2
+        yield return new WaitForSeconds(0.1f);
 
-        // 1. Matikan Spawner
-        if (mesinSpawner != null)
+        // Pastikan Waktu Jalan Dulu (Reset Pembekuan dari Scene 1)
+        Time.timeScale = 1;
+
+        // 2. SETUP GAMEMANAGER
+        if (GameManager.Instance != null)
         {
-            mesinSpawner.enabled = false;
-            Debug.Log("[2] Spawner dimatikan sementara.");
-        }
+            Debug.Log("[2] GameManager Ditemukan. Melakukan Setup Level Baru...");
 
-        // 2. Setup Briefing
-        if (briefingScript != null && dataLevelIni != null)
-        {
-            // Cek dulu isi dialog di data level
-            if (dataLevelIni.barisDialogSortir.Length == 0)
-            {
-                Debug.LogError("[ERROR] Data Level 'Baris Dialog Sortir' KOSONG (Size 0)! Dialog tidak akan muncul.");
-            }
-            else
-            {
-                Debug.Log("[3] Data ditemukan. Mengirim perintah SetupSequenceKhusus ke BriefingScript...");
-                Debug.Log("--> Jumlah dialog yang dikirim: " + dataLevelIni.barisDialogSortir.Length + " baris.");
+            // Hitung target sampah dari inventory (atau default 5 jika testing)
+            int targetSampah = (GameManager.Instance.trashInventory != null) ? GameManager.Instance.trashInventory.Count : 0;
+            if (targetSampah <= 0) targetSampah = 5;
 
-                briefingScript.SetupSequenceKhusus(dataLevelIni, dataLevelIni.barisDialogSortir);
-
-                // Sambungkan tombol
-                if (briefingScript.tombolMulai != null)
-                {
-                    briefingScript.tombolMulai.onClick.RemoveAllListeners();
-                    briefingScript.tombolMulai.onClick.AddListener(MulaiMain);
-                    Debug.Log("[4] Tombol Mulai berhasil disambungkan ke fungsi MulaiMain.");
-                }
-                else
-                {
-                    Debug.LogError("[ERROR] Tombol Mulai di dalam BriefingScript masih NULL/KOSONG!");
-                }
-            }
+            // Setup GameManager
+            GameManager.Instance.SetupLevelBaru(
+                true,
+                targetSampah,
+                dataLevelIni.batasWaktuDetik,
+                panelWinScene2,
+                textSkorAkhirScene2,
+                textWaktuAkhirScene2
+            );
         }
         else
         {
-            Debug.LogWarning("[WARNING] Data Level atau Briefing Script hilang! Langsung force start game.");
+            Debug.LogError("[CRITICAL] GameManager TIDAK DITEMUKAN! Pastikan 'DontDestroyOnLoad' jalan.");
+        }
+
+        // 3. LOGIKA BRIEFING & SPAWNER
+
+        // Matikan Spawner Awal
+        if (mesinSpawner != null) mesinSpawner.enabled = false;
+
+        // Cek apakah ada briefing
+        bool adaBriefing = (briefingScript != null && dataLevelIni != null && dataLevelIni.barisDialogSortir.Length > 0);
+
+        if (adaBriefing)
+        {
+            Debug.Log("[3] Memulai Briefing...");
+            briefingScript.SetupSequenceKhusus(dataLevelIni, dataLevelIni.barisDialogSortir);
+
+            if (briefingScript.tombolMulai != null)
+            {
+                briefingScript.tombolMulai.onClick.RemoveAllListeners();
+                briefingScript.tombolMulai.onClick.AddListener(MulaiMain);
+            }
+
+            // BEKUKAN WAKTU UNTUK BRIEFING (Hanya jika briefing siap)
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Debug.Log("[3] Tidak ada Briefing. Langsung main.");
             MulaiMain();
         }
     }
 
     public void MulaiMain()
     {
-        Debug.Log("[GAME START] Tombol Mulai Ditekan / Game Dimulai Paksa.");
+        Debug.Log("[GAME START] Game Dimulai.");
+        Time.timeScale = 1; // Pastikan waktu jalan
 
+        // Hilangkan UI Briefing
         if (briefingScript != null)
         {
             briefingScript.panelDialog.SetActive(false);
             if (briefingScript.panelIntro != null) briefingScript.panelIntro.SetActive(false);
         }
 
-        if (mesinSpawner != null)
-        {
-            mesinSpawner.enabled = true;
-            Debug.Log("[GAME START] Mesin Spawner Dinyalakan.");
-        }
+        // Nyalakan Spawner
+        if (mesinSpawner != null) mesinSpawner.enabled = true;
 
-        if (GameManager.Instance != null && dataLevelIni != null)
-        {
-            Debug.Log("[GAME START] GameManager Timer dijalankan: " + dataLevelIni.batasWaktuDetik + " detik.");
-            GameManager.Instance.MulaiLevel(dataLevelIni.batasWaktuDetik);
-        }
-        else
-        {
-            Debug.LogError("[ERROR] GameManager Instance tidak ditemukan atau Data Level kosong!");
-        }
+        // Mulai Timer di GameManager
+        if (GameManager.Instance != null) GameManager.Instance.MulaiLevel();
     }
 }
