@@ -14,6 +14,9 @@ public class ProcessingLevelManager : MonoBehaviour
 
     [Header("Data Level")]
     public LevelData dataLevelIni;
+    
+    [Tooltip("Isi 1 untuk Kantin, 2 untuk Lab IPA, 3 untuk Gudang")]
+    public int urutanLevel = 1;
 
     [Header("UI Scene Ini (Wajib Diisi di Inspector)")]
     public GameObject panelWinScene2;
@@ -48,14 +51,18 @@ public class ProcessingLevelManager : MonoBehaviour
             if (targetSampah <= 0) targetSampah = 5;
 
             // Setup GameManager
+            // ⚠️ UNTUK TESTING: Ubah 'true' menjadi 'false' untuk disable timer
             GameManager.Instance.SetupLevelBaru(
-                true,
+                false,  // ← Ubah ke 'false' untuk unlimited time saat testing
                 targetSampah,
                 dataLevelIni.batasWaktuDetik,
                 panelWinScene2,
                 textSkorAkhirScene2,
                 textWaktuAkhirScene2
             );
+            
+            // Set index level untuk progression system
+            GameManager.Instance.SetIndexLevel(urutanLevel);
         }
         else
         {

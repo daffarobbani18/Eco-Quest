@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     [Header("Level Settings (Di-update oleh LevelManager)")]
     public bool levelPakaiTimer = true;
     public int totalSampahLevelIni; // Target jumlah sampah agar menang
+    public int indexLevelSaatIni = 0; // Index level yang sedang dimainkan (untuk progression)
 
     [Header("UI References (Akan berubah tiap scene)")]
     public GameObject winPanel;       // Panel Menang
@@ -44,6 +45,14 @@ public class GameManager : MonoBehaviour
             // Hancurkan GameManager baru itu, kita pakai yang lama (yang bawa Inventory dari Kantin)
             Destroy(gameObject);
         }
+    }
+
+    // --- FUNGSI SET INDEX LEVEL ---
+    // Fungsi ini dipanggil oleh LevelManager untuk set level index (untuk progression)
+    public void SetIndexLevel(int index)
+    {
+        indexLevelSaatIni = index;
+        Debug.Log($"📍 Index Level diset ke: {index}");
     }
 
     // --- FUNGSI BARU (PENTING): UPDATE SETTING SAAT PINDAH SCENE ---
@@ -86,7 +95,12 @@ public class GameManager : MonoBehaviour
         {
             sisaWaktu -= Time.deltaTime;
             UpdateUI();
-            if (sisaWaktu <= 0) GameOver();
+            
+            // Cek waktu habis (tapi hanya jika game masih aktif)
+            if (sisaWaktu <= 0 && isGameActive)
+            {
+                GameOver();
+            }
         }
     }
 
@@ -130,11 +144,12 @@ public class GameManager : MonoBehaviour
     {
         totalSampahLevelIni--;
 
-        Debug.Log("Sisa Sampah Target: " + totalSampahLevelIni);
+        Debug.Log($"✅ KurangiJumlahSampah() dipanggil! Sisa Sampah Target: {totalSampahLevelIni}");
 
         // Cek Menang
         if (totalSampahLevelIni <= 0)
         {
+            Debug.Log("🎉 WIN CONDITION TERCAPAI! Memanggil LevelSelesai()...");
             LevelSelesai();
         }
     }
@@ -142,7 +157,37 @@ public class GameManager : MonoBehaviour
     void LevelSelesai()
     {
         isGameActive = false;
-        Debug.Log("LEVEL SELESAI - MENANG!");
+        Debug.Log("🏆 LEVEL SELESAI - MENANG!");
+        
+        // ============ SISTEM UNLOCK LEVEL BERIKUTNYA ============
+        // Hitung level berikutnya yang harus dibuka
+        int levelSelanjutnya = indexLevelSaatIni + 1;
+        
+        // Ambil data progress lama dari PlayerPrefs
+        int progressLama = PlayerPrefs.GetInt("LevelTerbuka", 1);
+        
+        // Hanya update jika level selanjutnya lebih tinggi dari progress lama
+        if (levelSelanjutnya > progressLama)
+        {
+            PlayerPrefs.SetInt("LevelTerbuka", levelSelanjutnya);
+            PlayerPrefs.Save();
+            Debug.Log($"🎉 PROGRESS TERSIMPAN! Level {levelSelanjutnya} sekarang terbuka!");
+        }
+        else
+        {
+            Debug.Log($"📊 Level {levelSelanjutnya} sudah terbuka sebelumnya. Progress tidak berubah.");
+        }
+        // =========================================================
+        
+        // Debug: Cek apakah winPanel NULL
+        if (winPanel == null)
+        {
+            Debug.LogError("❌ ERROR: winPanel NULL! Panel Win tidak bisa ditampilkan!");
+            Debug.LogError("   Pastikan Panel Win di-link di ProcessingLevelManager Inspector.");
+            return;
+        }
+        
+        Debug.Log($"✅ winPanel ditemukan: {winPanel.name}. Mengaktifkan panel...");
 
         if (winPanel != null)
         {
@@ -171,8 +216,39 @@ public class GameManager : MonoBehaviour
 
     void GameOver()
     {
+        // Guard: Jangan override jika sudah menang
+        if (!isGameActive)
+        {
+            Debug.Log("⚠️ GameOver() dipanggil tapi game sudah tidak aktif (mungkin sudah menang). Skip.");
+            return;
+        }
+        
         isGameActive = false;
-        Debug.Log("GAME OVER - WAKTU HABIS");
+        Debug.Log("⏱️ GAME OVER - WAKTU HABIS!");
+        
+        // Tetap tampilkan panel meskipun waktu habis
+        if (winPanel != null)
+        {
+            winPanel.SetActive(true);
+            
+            // Update text dengan data final
+            if (textSkorAkhir != null)
+                textSkorAkhir.text = "Skor Akhir: " + totalSkor;
+
+            if (textWaktuAkhir != null)
+            {
+                textWaktuAkhir.text = "Waktu Habis!";
+            }
+            
+            Debug.Log("📊 Panel Game Over ditampilkan dengan skor: " + totalSkor);
+        }
+        else
+        {
+            Debug.LogError("❌ winPanel NULL! Panel tidak bisa ditampilkan saat Game Over.");
+        }
+        
+        // Freeze game
+        Time.timeScale = 0;
     }
 
     void UpdateUI()

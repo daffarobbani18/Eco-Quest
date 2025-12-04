@@ -15,6 +15,9 @@ public class CollectionLevelManager : MonoBehaviour
 
     [Header("Data Level Ini")]
     public LevelData dataLevelIni; // Tetap butuh ini untuk memberi info ke BriefingSequence
+    
+    [Tooltip("Isi 1 untuk Kantin, 2 untuk Lab IPA, 3 untuk Gudang")]
+    public int urutanLevel = 1;
 
     [Header("Status")]
     public int totalSampahDiScene;
@@ -30,6 +33,13 @@ public class CollectionLevelManager : MonoBehaviour
 
     void Start()
     {
+        // Set index level untuk progression system
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SetIndexLevel(urutanLevel);
+            Debug.Log($"[CollectionLevelManager] Level Index diset ke: {urutanLevel}");
+        }
+        
         // Setup Data Sampah
         CollectionItem[] semuaSampah = FindObjectsOfType<CollectionItem>();
         totalSampahDiScene = semuaSampah.Length;

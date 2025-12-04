@@ -81,7 +81,8 @@ public class BriefingSequence : MonoBehaviour
             Debug.Log("[BRIEFING] Mainkan Intro...");
         }
 
-        yield return new WaitForSeconds(durasiAnimasi);
+        // Gunakan WaitForSecondsRealtime agar tidak terpengaruh Time.timeScale = 0
+        yield return new WaitForSecondsRealtime(durasiAnimasi);
 
         // Matikan Intro, Nyalakan Dialog
         if (panelIntro != null) panelIntro.SetActive(false);
@@ -150,14 +151,20 @@ public class BriefingSequence : MonoBehaviour
         if (panelIntro != null) panelIntro.SetActive(false);
         if (panelDialog != null) panelDialog.SetActive(false);
         
-        // Panggil MulaiMain di CollectionLevelManager
+        // Cek scene mana yang aktif dan panggil MulaiMain yang sesuai
         if (CollectionLevelManager.Instance != null)
         {
+            // Scene 02 (Kantin)
             CollectionLevelManager.Instance.MulaiMain();
+        }
+        else if (ProcessingLevelManager.Instance != null)
+        {
+            // Scene 03 (Processing)
+            ProcessingLevelManager.Instance.MulaiMain();
         }
         else
         {
-            Debug.LogWarning("[BRIEFING] CollectionLevelManager.Instance NULL! Game tidak bisa dimulai.");
+            Debug.LogWarning("[BRIEFING] Tidak ada LevelManager ditemukan! Game tidak bisa dimulai.");
         }
     }
 }

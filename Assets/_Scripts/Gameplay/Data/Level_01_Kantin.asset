@@ -25,6 +25,6 @@ MonoBehaviour:
   - Pilah ke tong Hijau (Organik), Kuning (Anorganik), atau B3. Jangan sampai salah
     atau jatuh ke lantai!
   - Siap? Waktu terus berjalan!
-  batasWaktuDetik: 0
-  targetJumlahSampah: 12
+  batasWaktuDetik: 60
+  targetJumlahSampah: 14
   daftarSampahLevelIni: []
