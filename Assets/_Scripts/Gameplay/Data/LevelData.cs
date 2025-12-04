@@ -1,19 +1,26 @@
 using UnityEngine;
-using System.Collections.Generic; // PENTING: Kita butuh ini untuk menggunakan 'List' (Daftar)
+using System.Collections.Generic;
 
-[CreateAssetMenu(fileName = "DataLevelBaru", menuName = "EcoQuest/Level Data", order = 2)]
+[CreateAssetMenu(fileName = "DataLevelBaru", menuName = "PjBL/Level Data", order = 2)]
 public class LevelData : ScriptableObject
 {
     [Header("Info Dasar Level")]
-    public string namaLevel; // Contoh: "Proyek Kantin"
-    [TextArea] public string deskripsiBriefing; // Teks untuk dialog Pak Budi di awal
+    public string namaLevel;
+
+    // --- BAGIAN INI YANG PENTING ---
+    [Header("Story Dialog")]
+    [TextArea(3, 10)] // Membuat kotak teksnya besar (min 3 baris, max 10)
+    public string[] barisDialogGuru;
+
+    // --- TAMBAHAN BARU UNTUK FASE 2 ---
+    [Header("Story Dialog (Fase Sortir)")]
+    [TextArea(3, 10)]
+    public string[] barisDialogSortir; // Dialog Fase 2 (Sortir)
 
     [Header("Aturan Main")]
-    public float batasWaktuDetik; // Contoh: 60 untuk 1 menit
-    public int targetJumlahSampah; // Berapa banyak sampah yang harus dikumpulkan
+    public float batasWaktuDetik;
+    public int targetJumlahSampah;
 
     [Header("Isi Level (Resep Sampah)")]
-    // Ini adalah BAGIAN PENTING. Ini adalah daftar (List) yang akan menampung
-    // file-file Data Sampah yang sudah Anda buat sebelumnya.
     public List<WasteData> daftarSampahLevelIni;
 }

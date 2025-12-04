@@ -2,9 +2,52 @@ using UnityEngine;
 
 public class BinController : MonoBehaviour
 {
-    // Kita pakai Enum yang sudah kita buat di Fase 1
+    [Header("Setting Tong")]
+    // Pilih jenis tong ini di Inspector (Organik / Anorganik / B3)
     public WasteType tipeTongIni;
 
-    // Fungsi visual sederhana (opsional)
-    // Nanti bisa ditambah animasi tutup tong terbuka saat mouse di atasnya
+    // -----------------------------------------------------------
+    // LOGIKA UTAMA: SAAT ADA BENDA MASUK AREA TONG
+    // -----------------------------------------------------------
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        // 1. Cek apakah benda yang masuk itu adalah Sampah?
+        // Kita cek apakah dia punya script 'CollectionItem' yang memegang data sampah
+        CollectionItem scriptSampah = other.GetComponent<CollectionItem>();
+
+        // Jika scriptnya ditemukan (berarti itu memang sampah)
+        if (scriptSampah != null)
+        {
+            // Ambil data jenis sampahnya
+            WasteData dataMasuk = scriptSampah.dataSampahIni;
+
+            // 2. BANDINGKAN: Apakah jenis sampah SAMA dengan jenis tong ini?
+            if (dataMasuk.tipeSampah == tipeTongIni)
+            {
+                // --- JIKA BENAR ---
+                Debug.Log("BENAR! " + dataMasuk.namaSampah + " masuk ke tong yang pas.");
+
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.TambahSkor(10);        // Nambah Skor
+                    GameManager.Instance.KurangiJumlahSampah(); // Kurangi Target Sisa
+                }
+
+                // Hancurkan sampah (seolah-olah sudah masuk tong)
+                Destroy(other.gameObject);
+            }
+            else
+            {
+                // --- JIKA SALAH ---
+                Debug.Log("SALAH! " + dataMasuk.namaSampah + " jangan dibuang di sini!");
+
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.KurangiSkor(5); // Hukuman kurangi nilai
+                    // Sampah TIDAK dihancurkan, biar pemain mindahin ke tong lain
+                    // Atau bisa juga dikasih efek mental (bepending sistem drag kamu)
+                }
+            }
+        }
+    }
 }

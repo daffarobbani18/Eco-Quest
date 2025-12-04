@@ -32,6 +32,12 @@ public class CollectionItem : MonoBehaviour
 
     void OnMouseDown()
     {
+        // CEK STATUS: Hanya boleh diklik jika game sedang playing (Briefing sudah tutup)
+        if (CollectionLevelManager.Instance != null && !CollectionLevelManager.Instance.isGamePlaying)
+        {
+            return; // Jangan lakukan apa-apa
+        }
+
         if (!isCollected && targetWadah != null)
         {
             MulaiTerbang();
@@ -73,19 +79,15 @@ public class CollectionItem : MonoBehaviour
 
     void MasukKeTas()
     {
-        // 1. Simpan ke GameManager (Inventory)
         if (GameManager.Instance != null)
         {
             GameManager.Instance.AddTrashToInventory(dataSampahIni);
+            GameManager.Instance.KurangiJumlahSampah();
         }
-
-        //  LAPOR KE MANAGER LEVEL ---
         if (CollectionLevelManager.Instance != null)
         {
             CollectionLevelManager.Instance.LaporSampahTerambil();
         }
-
-        // 2. Hancurkan objek
         Destroy(gameObject);
     }
 }

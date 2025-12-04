@@ -12,9 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5605dabca29a3dd40961dd136b2b7648, type: 3}
   m_Name: Level_01_Kantin
   m_EditorClassIdentifier: 
-  namaLevel: 'Proyek Kantin: Bersih-Bersih Jam Istirahat'
-  deskripsiBriefing: '"Tim, lihat kantin ini! Banyak sisa makanan dan botol. Tugas
-    kalian: Kumpulkan 15 sampah ke dalam wadah sebelum bel masuk berbunyi!"'
+  namaLevel: PROYEK KANTIN
+  barisDialogGuru:
+  - Halo Tim! Lihat kantin ini, kacau sekali!
+  - Banyak sisa makanan dan botol plastik berserakan.
+  - Tugasmu adalah mengamankan 15 sampah ini sebelum bel masuk.
+  - Siap? Ayo bergerak!
+  barisDialogSortir:
+  - Kerja bagus sudah membawa semuanya ke sini!
+  - Sekarang tugas inti dimulai. Sampah akan keluar dari alat itu.
+  - Sekarang tugas inti dimulai. Sampah akan keluar dari alat itu.
+  - Pilah ke tong Hijau (Organik), Kuning (Anorganik), atau B3. Jangan sampai salah
+    atau jatuh ke lantai!
+  - Siap? Waktu terus berjalan!
   batasWaktuDetik: 60
   targetJumlahSampah: 15
   daftarSampahLevelIni:

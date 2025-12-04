@@ -6,40 +6,61 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    [Header("UI References")]
-    // Kita buat static agar mudah diakses dari scene manapun tanpa drag-drop
-    public TMP_Text scoreTextUI;
-    public TMP_Text timerTextUI;
+    [Header("Level Settings (Atur per Scene)")]
+    public bool levelPakaiTimer = true; // MATIKAN ini di Inspector Scene Kantin!
+    public int totalSampahLevelIni;     // Target jumlah sampah agar menang
 
-    [Header("Game State")]
+    [Header("UI References (Win/Lose)")]
+    public GameObject winPanel;       // Drag Panel Win disini
+    public TMP_Text textSkorAkhir;    // Drag Text Skor di Panel Win
+    public TMP_Text textWaktuAkhir;   // Drag Text Waktu di Panel Win
+
+    [Header("UI References (HUD)")]
+    public TMP_Text scoreTextUI;      // Drag Text Skor di pojok layar
+    public TMP_Text timerTextUI;      // Drag Text Timer di pojok layar
+
+    [Header("Game State (Otomatis)")]
     public int totalSkor = 0;
     public float sisaWaktu = 60f;
     public bool isGameActive = false;
+    private float waktuAwal;
 
     // Inventaris (dari Fase 1)
     public List<WasteData> trashInventory;
 
     void Awake()
     {
+        // Singleton Pattern
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+            // Penting: Jika kamu menaruh Prefab GameManager di SETIAP scene secara manual,
+            // HAPUS baris DontDestroyOnLoad di bawah ini agar tidak duplikat/bentrok.
+            // DontDestroyOnLoad(gameObject); 
+
             trashInventory = new List<WasteData>();
         }
-        else { Destroy(gameObject); }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void Update()
     {
-        if (isGameActive && sisaWaktu > 0)
+        // Logika: Timer hanya jalan jika game aktif DAN level ini butuh timer
+        if (isGameActive && levelPakaiTimer && sisaWaktu > 0)
         {
             sisaWaktu -= Time.deltaTime;
-            UpdateUI(); // Update tampilan tiap frame
+            UpdateUI();
 
             if (sisaWaktu <= 0) GameOver();
         }
     }
+
+    // ---------------------------------------------------------
+    // LOGIKA GAMEPLAY
+    // ---------------------------------------------------------
 
     public void TambahSkor(int nilai)
     {
@@ -51,78 +72,110 @@ public class GameManager : MonoBehaviour
     {
         totalSkor -= nilai;
         if (totalSkor < 0) totalSkor = 0;
-        UpdateUI(); // Update tampilan
-
-        // Opsional: Mainkan suara salah di sini
+        UpdateUI();
     }
 
-    void UpdateUI()
+    // Fungsi KUNCI: Dipanggil saat sampah ditemukan (Kantin) atau dipilah (Pengolahan)
+    public void KurangiJumlahSampah()
     {
-        // Cek apakah UI tersedia
-        if (scoreTextUI != null)
-        {
-            scoreTextUI.text = "Skor: " + totalSkor;
-        }
+        totalSampahLevelIni--;
 
-        if (timerTextUI != null)
+        Debug.Log("Sisa Sampah Target: " + totalSampahLevelIni);
+
+        // Cek Menang
+        if (totalSampahLevelIni <= 0)
         {
-            int minutes = Mathf.FloorToInt(sisaWaktu / 60F);
-            int seconds = Mathf.FloorToInt(sisaWaktu - minutes * 60);
-            timerTextUI.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            LevelSelesai();
         }
     }
 
-    // Tambahkan 'float durasi' di dalam kurung
+    // ---------------------------------------------------------
+    // LOGIKA MULAI & SELESAI
+    // ---------------------------------------------------------
+
     public void MulaiLevel(float durasi)
     {
-        // Set sisa waktu sesuai angka yang dikirim (misal 60 detik)
         sisaWaktu = durasi;
-
+        waktuAwal = durasi;
         totalSkor = 0;
         isGameActive = true;
 
-        // Cari objek teks di scene secara otomatis
-        GameObject objSkor = GameObject.Find("Text_Skor");
-        GameObject objTimer = GameObject.Find("Text_Timer");
+        // Pastikan Win Panel mati saat mulai
+        if (winPanel != null) winPanel.SetActive(false);
+        Time.timeScale = 1; // Waktu jalan normal
 
-        if (objSkor != null) scoreTextUI = objSkor.GetComponent<TMP_Text>();
-        if (objTimer != null) timerTextUI = objTimer.GetComponent<TMP_Text>();
-
-        // PENTING: Panggil update UI sekali di awal biar angkanya langsung muncul
         UpdateUI();
+    }
+
+    void LevelSelesai()
+    {
+        isGameActive = false;
+        Debug.Log("LEVEL SELESAI - MENANG!");
+
+        if (winPanel != null)
+        {
+            winPanel.SetActive(true);
+
+            if (textSkorAkhir != null)
+                textSkorAkhir.text = "Skor Akhir: " + totalSkor;
+
+            if (textWaktuAkhir != null && levelPakaiTimer)
+            {
+                // Hitung waktu terpakai
+                float terpakai = waktuAwal - sisaWaktu;
+                int min = Mathf.FloorToInt(terpakai / 60F);
+                int sec = Mathf.FloorToInt(terpakai % 60);
+                textWaktuAkhir.text = string.Format("Waktu: {0:00}:{1:00}", min, sec);
+            }
+            else if (textWaktuAkhir != null)
+            {
+                textWaktuAkhir.text = "Selesai!";
+            }
+        }
+
+        // Matikan waktu physics
+        Time.timeScale = 0;
     }
 
     void GameOver()
     {
         isGameActive = false;
-        Debug.Log("GAME OVER");
-        // Nanti munculkan Panel Laporan di sini
+        Debug.Log("GAME OVER - WAKTU HABIS");
+        // Tambahkan logika panel kalah disini jika mau
+    }
+
+    void UpdateUI()
+    {
+        if (scoreTextUI != null) scoreTextUI.text = "Skor: " + totalSkor;
+
+        if (timerTextUI != null)
+        {
+            if (levelPakaiTimer)
+            {
+                int minutes = Mathf.FloorToInt(sisaWaktu / 60F);
+                int seconds = Mathf.FloorToInt(sisaWaktu - minutes * 60);
+                timerTextUI.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            }
+            else
+            {
+                // Jika mode santai, sembunyikan timer atau tulis pesan lain
+                timerTextUI.text = "";
+            }
+        }
     }
 
     // ---------------------------------------------------------
-    // FUNGSI INVENTARIS (Untuk Fase 1: Koleksi)
+    // FUNGSI INVENTARIS (Tetap Ada)
     // ---------------------------------------------------------
 
-    // Fungsi ini dipanggil oleh CollectionItem.cs saat sampah masuk wadah
     public void AddTrashToInventory(WasteData newTrash)
     {
-        // Pastikan list tidak null (untuk jaga-jaga)
-        if (trashInventory == null)
-        {
-            trashInventory = new List<WasteData>();
-        }
-
+        if (trashInventory == null) trashInventory = new List<WasteData>();
         trashInventory.Add(newTrash);
-        Debug.Log("GameManager: Berhasil menyimpan " + newTrash.namaSampah + " ke inventaris.");
     }
 
-    // Fungsi untuk mengosongkan tas (misal saat restart level)
     public void ClearInventory()
     {
-        if (trashInventory != null)
-        {
-            trashInventory.Clear();
-        }
-        Debug.Log("GameManager: Inventaris dikosongkan.");
+        if (trashInventory != null) trashInventory.Clear();
     }
 }

@@ -12,19 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5605dabca29a3dd40961dd136b2b7648, type: 3}
   m_Name: Level_02_LabIPA
   m_EditorClassIdentifier: 
-  namaLevel: 'Proyek Lab IPA: Awas Limbah Berbahaya!'
-  deskripsiBriefing: 'Tim, perhatian penuh! Lab IPA sangat berantakan setelah eksperimen
-    besar tadi.
+  namaLevel: MISI BAHAYA LAB IPA
+  deskripsiBriefing: 'Perhatian ekstra, Tim! Lab IPA sangat berantakan setelah eksperimen
+    tadi.
 
 
-    Hati-hati, tantangan kali ini berbeda. Di antara sampah biasa,
-    ada banyak **limbah B3 (Berbahaya & Beracun)** seperti baterai bekas, pecahan
-    bohlam, dan botol bahan kimia.
-
-
-    Jangan sampai salah mengenali mereka, karena
-    bisa berbahaya! Kumpulkan semuanya dengan ekstra teliti dan hati-hati. Selamat
-    bekerja!'
+    Hati-hati! Di sini banyak sampah B3 (Bahan Berbahaya & Beracun).
+    Jangan sembarangan pegang! Kumpulkan 20 item dengan teliti agar tidak membahayakan
+    siswa lain.'
   batasWaktuDetik: 90
   targetJumlahSampah: 20
   daftarSampahLevelIni:

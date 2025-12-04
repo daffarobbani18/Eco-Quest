@@ -288,6 +288,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 440027444}
+  - {fileID: 840204801}
   - {fileID: 1737694818}
   m_Father: {fileID: 1318010655}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -781,11 +783,11 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 312672694}
-  m_Father: {fileID: 1318010655}
+  m_Father: {fileID: 164852928}
   m_LocalEulerAnglesHint: {x: -178.737, y: 2.8179932, z: 359.857}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -960.31226, y: -543.64}
+  m_AnchoredPosition: {x: -0.4790039, y: -4.9016113}
   m_SizeDelta: {x: 12.1616, y: 3.7599}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &440027445
@@ -1031,8 +1033,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1725107079
-  m_SortingLayer: 2
+  m_SortingLayerID: 344361953
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: 1720286554, guid: b6493b5c365e4134cb082dca7420f46a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -1053,12 +1055,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 840204799}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.0654, y: -2.98, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -7.2321167, y: -4.241516, z: 0}
   m_LocalScale: {x: 1.3901814, y: 1.3613102, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 164852928}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &884217151
 GameObject:
@@ -1433,7 +1435,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 440027444}
   - {fileID: 164852928}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2015,6 +2016,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 1621055762}
   - {fileID: 1395777269}
-  - {fileID: 840204801}
   - {fileID: 1165485081}
   - {fileID: 1318010655}
