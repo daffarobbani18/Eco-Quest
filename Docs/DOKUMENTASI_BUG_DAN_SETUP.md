@@ -387,15 +387,22 @@ Scene: 03_Game_Processing
 
 - **Cara Membuat WasteData:**
   1. Klik kanan di Project Window
-  2. Create > PjBL > Waste Data
+  2. Create > EcoQuest > Waste Data
   3. Isi field:
      ```
      Nama Sampah: "Botol Plastik"
-     Kategori Sampah: Anorganik
+     Tipe Sampah: Anorganik
      Icon Sampah: [Drag sprite botol]
-     Skor Benar: 10
-     Skor Salah: -5
+     
+     ── Scoring (Scene 03 - Pemilahan) ──
+     Skor Benar: 10   (default, bisa diubah sesuai kebutuhan)
+     Skor Salah: 5    (angka positif, akan otomatis jadi -5 di game)
      ```
+  
+  **Catatan Penting:**
+  - `skorSalah` gunakan angka **positif** (misal: 5 untuk penalty -5 poin)
+  - Field skor opsional, jika tidak diisi akan pakai default (10 dan 5)
+  - Setiap sampah bisa punya nilai berbeda untuk game balancing
 
 ---
 
@@ -494,8 +501,10 @@ Scene: 03_Game_Processing
 - [ ] WasteSpawner.prefabSampah terisi (drag Prefab sampah)
 - [ ] WasteSpawner.titikSpawn terisi (drag TitikSpawn GameObject)
 - [ ] WasteSpawner.daftarSampahTest terisi minimal 3 data (untuk testing)
+- [ ] **PENTING:** Semua WasteData sudah punya nilai `skorBenar` dan `skorSalah` (cek di Inspector)
 - [ ] Ada Prefab "Panel_DialogGuru" di Canvas (sama seperti Scene 02)
 - [ ] LevelData_Processing.barisDialogSortir terisi (minimal 3 kalimat)
+- [ ] LevelData_Processing.barisDialogSortir **TIDAK NULL** (jika tidak ada dialog, buat array kosong [] bukan null)
 - [ ] Ada GameObject bernama "Text_Skor" (NAMA HARUS PERSIS)
 - [ ] Ada GameObject bernama "Text_Timer" (NAMA HARUS PERSIS)
 - [ ] **TIDAK ADA** GameObject "GameManager" di Scene 03 (akan terbawa dari Scene 02)
@@ -755,6 +764,12 @@ GameManager: Setup Level Baru dimulai...
 [GAME START] Game Dimulai.
 Spawner: Menggunakan Data dari Inventaris Pemain (Fase 1).
 (Timer mulai jalan, sampah mulai spawn)
+
+(Saat drag sampah ke tong:)
+BENAR! Botol Plastik masuk ke tong yang pas. +10 poin  ← Skor dinamis dari WasteData
+Sisa Sampah Target: 7
+
+SALAH! Sisa Nasi jangan dibuang di sini! -3 poin  ← Penalty dinamis dari WasteData
 ```
 
 ### **Jika Tidak Ada Log:**
@@ -836,6 +851,60 @@ Spawner: Menggunakan Data dari Inventaris Pemain (Fase 1).
 
 10. **Save Scene!**
 
+### **Fase 2.5: Update Semua WasteData (PENTING SETELAH PERBAIKAN SCRIPT)**
+
+⚠️ **WAJIB DILAKUKAN** setelah perbaikan script!
+
+1. **Buka folder WasteData:**
+   - Di Project Window: `Assets/_Scripts/Gameplay/Data/` (atau folder tempat WasteData Anda)
+
+2. **Update setiap WasteData:**
+   - Klik file `WasteData_xxx.asset`
+   - Lihat Inspector, akan ada section baru:
+   ```
+   ── Scoring (Scene 03 - Pemilahan) ──
+   Skor Benar: 10
+   Skor Salah: 5
+   ```
+
+3. **Isi nilai sesuai desain game:**
+   
+   **Contoh Easy (Organik biasa):**
+   ```
+   WasteData_SisaNasi:
+     Skor Benar: 5
+     Skor Salah: 3
+   ```
+   
+   **Contoh Medium (Anorganik standar):**
+   ```
+   WasteData_BotolPlastik:
+     Skor Benar: 10
+     Skor Salah: 5
+   ```
+   
+   **Contoh Hard (B3 berbahaya):**
+   ```
+   WasteData_Baterai:
+     Skor Benar: 20
+     Skor Salah: 15
+   ```
+
+4. **Save Project:**
+   - Ctrl + S atau File > Save Project
+
+5. **Verifikasi:**
+   - Buka WasteSpawner di Inspector
+   - Cek `Daftar Sampah Test` → Expand tiap item
+   - Pastikan skorBenar dan skorSalah terisi (tidak 0)
+
+**Catatan:**
+- Jika tidak diisi, akan pakai default: skorBenar=10, skorSalah=5
+- Nilai skorSalah adalah **positif** (misal: tulis 5, di game jadi -5)
+- Tooltip akan muncul saat hover di Inspector untuk panduan
+
+---
+
 ### **Fase 3: Testing Akhir**
 
 1. **Test dari Scene 02:**
@@ -863,15 +932,181 @@ Spawner: Menggunakan Data dari Inventaris Pemain (Fase 1).
 | GameManager tidak persisten | DontDestroyOnLoad tidak jalan atau ada 2 GameManager | Pastikan hanya 1 GameManager di Scene 02, cek Awake() |
 | Inventory kosong di Scene 03 | Pemain tidak klik sampah atau AddTrashToInventory tidak dipanggil | Cek CollectionItem.OnClick() memanggil GameManager.AddTrashToInventory() |
 | Game freeze di Scene 03 | Time.timeScale = 0 tidak ter-reset | Cek ProcessingLevelManager.Start() panggil Time.timeScale = 1 |
+| Skor tidak bertambah/berkurang | WasteData.skorBenar/skorSalah = 0 atau null | Buka WasteData di Inspector, isi field Skor Benar dan Skor Salah |
+| Debug log error "NullReferenceException" di Scene 03 | barisDialogSortir = null di LevelData | Buka LevelData_Processing, pastikan array barisDialogSortir minimal [] kosong, bukan null |
+| Semua sampah punya skor sama | Lupa update WasteData setelah perbaikan script | Follow Fase 2.5 untuk update semua WasteData |
 
 ---
 
 ## 📞 SUPPORT & CREDITS
 
+---
+
+## 🔄 PERUBAHAN SETELAH PERBAIKAN SCRIPT (Update: 4 Desember 2025)
+
+### **📝 Summary Perbaikan:**
+
+Setelah analisis mendalam, telah dilakukan perbaikan pada **8 masalah** (4 CRITICAL, 3 HIGH, 1 MEDIUM):
+
+#### **✅ CRITICAL Fixes (Sudah Diperbaiki):**
+1. ✅ **BinController.cs** - Ganti `CollectionItem` → `WasteItem`
+2. ✅ **DragController.cs** - Tambah `KurangiJumlahSampah()` saat benar
+3. ✅ **CollectionItem.cs** - Hapus `KurangiJumlahSampah()` yang salah tempat
+4. ✅ **DragController.cs** - Tambah null check untuk GameManager
+
+#### **✅ HIGH Fixes (Sudah Diperbaiki):**
+5. ✅ **WasteData.cs** - Tambah field `skorBenar` dan `skorSalah`
+6. ✅ **DragController.cs** - Pakai skor dinamis dari WasteData
+7. ✅ **BinController.cs** - Pakai skor dinamis dari WasteData
+
+#### **✅ MEDIUM Fixes (Sudah Diperbaiki):**
+8. ✅ **ProcessingLevelManager.cs** - Tambah null check `barisDialogSortir`
+
+---
+
+### **⚠️ YANG HARUS DILAKUKAN SETELAH PERBAIKAN:**
+
+#### **1. Update Semua WasteData (WAJIB!):**
+
+Karena ada penambahan field baru di `WasteData.cs`, Anda **HARUS** update semua file WasteData yang sudah ada:
+
+**Langkah:**
+1. Buka folder: `Assets/_Scripts/Gameplay/Data/`
+2. Klik setiap file `WasteData_xxx.asset`
+3. Di Inspector, akan muncul section baru:
+   ```
+   ── Scoring (Scene 03 - Pemilahan) ──
+   Skor Benar: 10
+   Skor Salah: 5
+   ```
+4. Isi nilai sesuai tingkat kesulitan sampah
+5. Save Project (Ctrl + S)
+
+**Default Values:**
+- Jika tidak diisi, otomatis pakai: `skorBenar = 10`, `skorSalah = 5`
+- Backward compatible dengan WasteData lama
+
+**Contoh Isian:**
+```
+Sampah Mudah (Organik):
+  skorBenar = 5
+  skorSalah = 3
+
+Sampah Standar (Anorganik):
+  skorBenar = 10
+  skorSalah = 5
+
+Sampah Sulit (B3):
+  skorBenar = 20
+  skorSalah = 15
+```
+
+---
+
+#### **2. Verifikasi LevelData_Processing:**
+
+Pastikan `barisDialogSortir` **tidak NULL**:
+
+**Cara Cek:**
+1. Buka `LevelData_Processing.asset`
+2. Lihat field `Baris Dialog Sortir`
+3. **Jika kosong:** Klik ikon list, tambah minimal 1 element (bisa string kosong)
+4. **Jangan biarkan:** Array = None (null) ❌
+5. **Harus:** Array = [] atau Array dengan isi ✅
+
+**Alasan:**
+- Setelah perbaikan, ada null check di `ProcessingLevelManager`
+- Jika array null, briefing akan di-skip (langsung main)
+- Ini fitur, bukan bug - untuk testing tanpa briefing
+
+---
+
+### **📊 Perbandingan Setup Sebelum vs Sesudah:**
+
+| Aspek | Sebelum Perbaikan | Sesudah Perbaikan |
+|-------|-------------------|-------------------|
+| **WasteData Fields** | Hanya nama, tipe, icon | + skorBenar, skorSalah |
+| **Scoring System** | Hardcode (10, -5) | Dinamis per sampah |
+| **BinController** | Cari CollectionItem ❌ | Cari WasteItem ✅ |
+| **Counter Sampah** | Berkurang di Scene 02 ❌ | Berkurang di Scene 03 ✅ |
+| **Null Safety** | Tidak ada | Ada di semua akses GameManager |
+| **barisDialogSortir** | Bisa crash jika null | Aman dengan null check |
+| **Debug Log** | "BENAR!" / "SALAH!" | "BENAR! +10 poin" / "SALAH! -5 poin" |
+
+---
+
+### **🧪 Testing Checklist Tambahan:**
+
+Setelah perbaikan script, tambahkan test case ini:
+
+- [ ] **Test Skor Dinamis:**
+  - Buat 3 WasteData dengan skor berbeda (5, 10, 20)
+  - Buang ke tong benar → Cek skor sesuai WasteData
+  - Buang ke tong salah → Cek penalty sesuai WasteData
+
+- [ ] **Test Null Safety:**
+  - Buka Scene 03 langsung (tanpa GameManager dari Scene 02)
+  - Pastikan tidak crash, muncul log error tapi game jalan
+
+- [ ] **Test Null barisDialogSortir:**
+  - Set `barisDialogSortir = null` di LevelData_Processing
+  - Play Scene 03 → Harus langsung main tanpa briefing
+
+- [ ] **Test Backward Compatibility:**
+  - Pakai WasteData lama (belum ada field skor)
+  - Pastikan otomatis pakai default (10 dan 5)
+
+---
+
+### **📚 Dokumentasi Lengkap Perbaikan:**
+
+Untuk detail lengkap setiap perbaikan, lihat file:
+
+1. **`PERBAIKAN_CRITICAL_BUGS.md`** - Detail perbaikan CRITICAL (4 masalah)
+2. **`PERBAIKAN_HIGH_MEDIUM.md`** - Detail perbaikan HIGH & MEDIUM (4 masalah)
+3. **File ini** - Setup hierarchy & workflow
+
+---
+
+### **🎯 Status Akhir:**
+
+| Kategori | Status | Keterangan |
+|----------|--------|------------|
+| **Script Fixes** | ✅ 100% Done | 8/8 masalah diperbaiki |
+| **Documentation** | ✅ Up to Date | Dokumentasi sudah disesuaikan |
+| **Testing Required** | ⏳ Pending | Butuh testing dari developer |
+| **WasteData Update** | ⚠️ Action Needed | Harus update manual di Inspector |
+| **Hierarchy Setup** | ⏳ Pending | Follow guide di dokumentasi ini |
+
+---
+
+### **🚀 Next Action Items:**
+
+**Untuk Developer:**
+1. ✅ Read dokumentasi perbaikan (done)
+2. ⏳ Update semua WasteData di Inspector
+3. ⏳ Setup Hierarchy Scene 03 (follow guide di atas)
+4. ⏳ Testing gameplay Scene 02 → Scene 03
+5. ⏳ Fix hierarchy jika ada yang kurang
+
+**Untuk Game Designer:**
+1. ⏳ Review nilai skor tiap WasteData
+2. ⏳ Balance difficulty per level
+3. ⏳ Tulis dialog untuk `barisDialogSortir`
+4. ⏳ Playtesting & feedback
+
+**Untuk QA:**
+1. ⏳ Test semua test case di checklist
+2. ⏳ Test edge cases (null, empty, etc)
+3. ⏳ Report bug jika masih ada
+
+---
+
 **Developer:** daffarobbani18  
 **Project:** Eco-Quest - Game Edukasi Pemilahan Sampah  
 **Unity Version:** (sesuai ProjectVersion.txt)  
-**Last Updated:** December 4, 2025
+**Last Updated:** December 4, 2025  
+**Documentation Version:** 2.0 (Updated after script fixes)
 
 ---
 
