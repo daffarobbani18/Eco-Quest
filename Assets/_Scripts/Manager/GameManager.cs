@@ -78,8 +78,25 @@ public class GameManager : MonoBehaviour
         GameObject objSkor = GameObject.Find("Text_Skor");
         GameObject objTimer = GameObject.Find("Text_Timer");
 
-        if (objSkor != null) scoreTextUI = objSkor.GetComponent<TMP_Text>();
-        if (objTimer != null) timerTextUI = objTimer.GetComponent<TMP_Text>();
+        if (objSkor != null)
+        {
+            scoreTextUI = objSkor.GetComponent<TMP_Text>();
+            Debug.Log("✅ Text_Skor ditemukan dan berhasil di-link!");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ GameObject 'Text_Skor' TIDAK DITEMUKAN! Cek nama di Hierarchy.");
+        }
+
+        if (objTimer != null)
+        {
+            timerTextUI = objTimer.GetComponent<TMP_Text>();
+            Debug.Log("✅ Text_Timer ditemukan dan berhasil di-link!");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ GameObject 'Text_Timer' TIDAK DITEMUKAN! Cek nama di Hierarchy.");
+        }
 
         // 4. Reset Status & WAKTU (P3K agar game tidak beku)
         isGameActive = false;
@@ -253,7 +270,10 @@ public class GameManager : MonoBehaviour
 
     void UpdateUI()
     {
-        if (scoreTextUI != null) scoreTextUI.text = "Skor: " + totalSkor;
+        if (scoreTextUI != null)
+        {
+            scoreTextUI.text = "Skor: " + totalSkor;
+        }
 
         if (timerTextUI != null)
         {
@@ -265,8 +285,12 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                timerTextUI.text = "";
+                timerTextUI.text = ""; // Timer disabled (unlimited time)
             }
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ UpdateUI: timerTextUI NULL! Timer tidak bisa diupdate.");
         }
     }
 
@@ -278,6 +302,10 @@ public class GameManager : MonoBehaviour
     {
         if (trashInventory == null) trashInventory = new List<WasteData>();
         trashInventory.Add(newTrash);
+        
+        // Debug log untuk verifikasi inventory
+        Debug.Log($"📦 [INVENTORY] +1 Sampah: {newTrash.namaSampah} (Tipe: {newTrash.tipeSampah})");
+        Debug.Log($"📊 [INVENTORY] Total: {trashInventory.Count} sampah");
     }
 
     public void ClearInventory()

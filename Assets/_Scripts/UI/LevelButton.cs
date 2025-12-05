@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class LevelButton : MonoBehaviour
 {
@@ -17,6 +18,20 @@ public class LevelButton : MonoBehaviour
     
     [Tooltip("Komponen Button dari GameObject ini")]
     public Button buttonComponent;
+
+    [Header("Audio Settings")]
+    [Tooltip("Referensi ke Audio Source scene")]
+    public AudioSource sfxSource;
+    
+    [Tooltip("Suara kertas saat level terbuka diklik")]
+    public AudioClip paperSound;
+    
+    [Tooltip("Suara gembok/error saat level terkunci diklik")]
+    public AudioClip lockedSound;
+    
+    [Header("Transition Settings")]
+    [Tooltip("Delay sebelum load scene (agar animasi/audio selesai)")]
+    public float loadDelay = 0.3f;
 
     void Start()
     {
@@ -49,8 +64,8 @@ public class LevelButton : MonoBehaviour
             if (padlockOverlay != null)
                 padlockOverlay.SetActive(true);
             
-            if (buttonComponent != null)
-                buttonComponent.interactable = false;
+            // Biarkan button tetap interactable agar bisa bunyi "Gembok"
+            // Pengecekan lock/unlock dilakukan di OnClickLevel()
             
             Debug.Log($"🔒 Level {levelIndex} terkunci");
         }
@@ -59,9 +74,6 @@ public class LevelButton : MonoBehaviour
             // Level Terbuka
             if (padlockOverlay != null)
                 padlockOverlay.SetActive(false);
-            
-            if (buttonComponent != null)
-                buttonComponent.interactable = true;
             
             Debug.Log($"✅ Level {levelIndex} terbuka");
         }
@@ -72,13 +84,50 @@ public class LevelButton : MonoBehaviour
     /// </summary>
     public void OnClickLevel()
     {
+        // Cek apakah level terkunci atau terbuka
+        if (padlockOverlay != null && padlockOverlay.activeSelf)
+        {
+            // Level TERKUNCI - Mainkan suara gembok/error
+            if (sfxSource != null && lockedSound != null)
+            {
+                sfxSource.PlayOneShot(lockedSound);
+            }
+            
+            Debug.Log($"🔒 Level {levelIndex} terkunci! Selesaikan level sebelumnya terlebih dahulu.");
+            return; // Jangan load scene
+        }
+
+        // Level TERBUKA - Mainkan suara kertas dan load scene
         if (string.IsNullOrEmpty(sceneName))
         {
             Debug.LogError($"❌ LevelButton [{levelIndex}]: Scene Name belum diisi!");
             return;
         }
 
-        Debug.Log($"🎮 Loading Level {levelIndex}: {sceneName}");
+        // Mainkan suara kertas dan tunggu sebelum load scene
+        if (sfxSource != null && paperSound != null)
+        {
+            sfxSource.PlayOneShot(paperSound);
+        }
+
+        // Disable button agar tidak diklik ganda
+        if (buttonComponent != null)
+        {
+            buttonComponent.interactable = false;
+        }
+
+        Debug.Log($"🎮 Loading Level {levelIndex}: {sceneName} (delay: {loadDelay}s)");
+        
+        // Tunggu animasi/audio selesai baru load scene
+        StartCoroutine(LoadSceneWithDelay());
+    }
+
+    /// <summary>
+    /// Coroutine untuk menunggu animasi/audio selesai sebelum load scene
+    /// </summary>
+    IEnumerator LoadSceneWithDelay()
+    {
+        yield return new WaitForSeconds(loadDelay);
         SceneManager.LoadScene(sceneName);
     }
 

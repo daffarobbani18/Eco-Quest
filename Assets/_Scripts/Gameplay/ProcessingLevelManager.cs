@@ -22,6 +22,12 @@ public class ProcessingLevelManager : MonoBehaviour
     public GameObject panelWinScene2;
     public TMP_Text textSkorAkhirScene2;
     public TMP_Text textWaktuAkhirScene2;
+    
+    [Header("UI HUD (Optional - Untuk Manual Linking)")]
+    [Tooltip("Opsional: Drag Text_Skor jika auto-find gagal")]
+    public TMP_Text textSkorHUD;
+    [Tooltip("Opsional: Drag Text_Timer jika auto-find gagal")]
+    public TMP_Text textTimerHUD;
 
     void Awake()
     {
@@ -53,7 +59,7 @@ public class ProcessingLevelManager : MonoBehaviour
             // Setup GameManager
             // ⚠️ UNTUK TESTING: Ubah 'true' menjadi 'false' untuk disable timer
             GameManager.Instance.SetupLevelBaru(
-                false,  // ← Ubah ke 'false' untuk unlimited time saat testing
+                true,  // ← Ubah ke 'false' untuk unlimited time saat testing
                 targetSampah,
                 dataLevelIni.batasWaktuDetik,
                 panelWinScene2,
@@ -63,6 +69,18 @@ public class ProcessingLevelManager : MonoBehaviour
             
             // Set index level untuk progression system
             GameManager.Instance.SetIndexLevel(urutanLevel);
+            
+            // Manual override jika HUD di-assign di Inspector
+            if (textSkorHUD != null)
+            {
+                GameManager.Instance.scoreTextUI = textSkorHUD;
+                Debug.Log("✅ Text Skor HUD di-override manual dari Inspector");
+            }
+            if (textTimerHUD != null)
+            {
+                GameManager.Instance.timerTextUI = textTimerHUD;
+                Debug.Log("✅ Text Timer HUD di-override manual dari Inspector");
+            }
         }
         else
         {

@@ -915,6 +915,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 99a9424e99e42714fa01c9af6a21e2a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  denda: 5
+  source: {fileID: 0}
+  failSound: {fileID: 0}
 --- !u!212 &406651534
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1035,9 +1038,12 @@ MonoBehaviour:
   mesinSpawner: {fileID: 2145313692}
   briefingScript: {fileID: 452329881}
   dataLevelIni: {fileID: 11400000, guid: 268d62b9f2b5ead4ea06a2b5b851672e, type: 2}
+  urutanLevel: 1
   panelWinScene2: {fileID: 1751812990}
   textSkorAkhirScene2: {fileID: 1462212525}
   textWaktuAkhirScene2: {fileID: 2019076791}
+  textSkorHUD: {fileID: 0}
+  textTimerHUD: {fileID: 0}
 --- !u!4 &452329883
 Transform:
   m_ObjectHideFlags: 0
@@ -2818,7 +2824,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1751812991
 RectTransform:
   m_ObjectHideFlags: 0

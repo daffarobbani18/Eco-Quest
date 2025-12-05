@@ -12,14 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5605dabca29a3dd40961dd136b2b7648, type: 3}
   m_Name: Level_02_LabIPA
   m_EditorClassIdentifier: 
-  namaLevel: MISI BAHAYA LAB IPA
-  deskripsiBriefing: 'Perhatian ekstra, Tim! Lab IPA sangat berantakan setelah eksperimen
-    tadi.
-
-
-    Hati-hati! Di sini banyak sampah B3 (Bahan Berbahaya & Beracun).
-    Jangan sembarangan pegang! Kumpulkan 20 item dengan teliti agar tidak membahayakan
-    siswa lain.'
+  namaLevel: MISI  LAB IPA
+  barisDialogGuru: []
+  barisDialogSortir: []
   batasWaktuDetik: 90
   targetJumlahSampah: 20
   daftarSampahLevelIni:

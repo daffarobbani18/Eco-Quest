@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ea3ab0c3a04152e4387013107fb198f8
+guid: 83f4be49a3e00294e8a5d1c52b1704ff
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -43,12 +43,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 560
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -108,7 +108,91 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: panel_intro_0
+      rect:
+        serializedVersion: 2
+        x: 783
+        y: 900
+        width: 1093
+        height: 1112
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 514a3fb77002f2a4e8783b81d4381526
+      internalID: 1283900573
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: panel_intro_1
+      rect:
+        serializedVersion: 2
+        x: 8104
+        y: 794
+        width: 1172
+        height: 1364
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4bdc7025adc25294aae5e38941b9eb87
+      internalID: -146780216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: panel_intro_2
+      rect:
+        serializedVersion: 2
+        x: 2359
+        y: 761
+        width: 5315
+        height: 3264
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9598f1659c6af7844aca7c59a2cfe0de
+      internalID: 472642994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: panel_intro_3
+      rect:
+        serializedVersion: 2
+        x: 2875
+        y: 4150
+        width: 4243
+        height: 1046
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 03eeed3bd9d5efb47bb6c890e49fa4f5
+      internalID: -1827398040
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -119,7 +203,11 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      panel_intro_0: 1283900573
+      panel_intro_1: -146780216
+      panel_intro_2: 472642994
+      panel_intro_3: -1827398040
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
