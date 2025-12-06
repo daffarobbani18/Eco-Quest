@@ -152,30 +152,55 @@ public class ProcessingLevelManager : MonoBehaviour
         // PENTING: Reset time scale agar scene baru tidak freeze
         Time.timeScale = 1f;
         
+        // Clear inventory untuk mulai fresh di level baru
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ClearInventory();
+        }
+        
         // Cek apakah ada scene selanjutnya
         if (!string.IsNullOrEmpty(namaSceneSelanjutnya))
         {
             Debug.Log($"➡️ Lanjut ke level berikutnya: {namaSceneSelanjutnya}");
             
-            // Clear inventory untuk mulai fresh di level baru
-            if (GameManager.Instance != null)
+            // Cek apakah scene ada di Build Settings
+            if (SceneExists(namaSceneSelanjutnya))
             {
-                GameManager.Instance.ClearInventory();
+                SceneManager.LoadScene(namaSceneSelanjutnya);
             }
-            
-            SceneManager.LoadScene(namaSceneSelanjutnya);
+            else
+            {
+                Debug.LogError($"❌ Scene '{namaSceneSelanjutnya}' tidak ditemukan di Build Settings!");
+                Debug.LogWarning("⚠️ Pastikan scene sudah ditambahkan di File → Build Settings");
+                Debug.Log("🏠 Fallback: Kembali ke Hub");
+                SceneManager.LoadScene("01_Hub_Klub");
+            }
         }
         else
         {
             // Jika kosong (level terakhir), kembali ke Hub
             Debug.Log("🏁 Level terakhir selesai! Kembali ke Hub.");
-            
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.ClearInventory();
-            }
-            
             SceneManager.LoadScene("01_Hub_Klub");
         }
+    }
+    
+    /// <summary>
+    /// Helper function: Cek apakah scene ada di Build Settings
+    /// </summary>
+    private bool SceneExists(string sceneName)
+    {
+        // Cek di Build Settings
+        for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string scenePath = SceneUtility.GetScenePathByBuildIndex(i);
+            string sceneNameInBuild = System.IO.Path.GetFileNameWithoutExtension(scenePath);
+            
+            if (sceneNameInBuild == sceneName)
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
