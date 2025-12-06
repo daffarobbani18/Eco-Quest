@@ -27,6 +27,10 @@ public class ProcessingLevelManager : MonoBehaviour
     public TMP_Text textSkorAkhirScene2;
     public TMP_Text textWaktuAkhirScene2;
     
+    [Header("Sorting Guide Panel")]
+    [Tooltip("Panel panduan sortir yang muncul setelah briefing")]
+    public GameObject panelSortingGuide;
+    
     [Header("UI HUD (Optional - Untuk Manual Linking)")]
     [Tooltip("Opsional: Drag Text_Skor jika auto-find gagal")]
     public TMP_Text textSkorHUD;
@@ -93,54 +97,175 @@ public class ProcessingLevelManager : MonoBehaviour
         }
 
         // 3. LOGIKA BRIEFING & SPAWNER
+        Debug.Log("==================================================");
+        Debug.Log("[3] MEMULAI LOGIKA BRIEFING & SORTING GUIDE");
 
         // Matikan Spawner Awal
-        if (mesinSpawner != null) mesinSpawner.enabled = false;
+        if (mesinSpawner != null) 
+        {
+            mesinSpawner.enabled = false;
+            Debug.Log("✅ Spawner dimatikan");
+        }
+        
+        // Matikan Sorting Guide Panel di awal
+        if (panelSortingGuide != null) 
+        {
+            panelSortingGuide.SetActive(false);
+            Debug.Log("✅ Panel Sorting Guide dimatikan di awal");
+        }
+        else
+        {
+            Debug.LogError("❌ panelSortingGuide NULL! Tidak di-assign di Inspector!");
+        }
 
         // Cek apakah ada briefing (dengan null check lengkap)
+        Debug.Log($"📋 CEK BRIEFING:");
+        Debug.Log($"   - briefingScript: {(briefingScript != null ? "✅" : "❌ NULL")}");
+        Debug.Log($"   - dataLevelIni: {(dataLevelIni != null ? "✅" : "❌ NULL")}");
+        if (dataLevelIni != null)
+        {
+            Debug.Log($"   - barisDialogSortir: {(dataLevelIni.barisDialogSortir != null ? $"✅ ({dataLevelIni.barisDialogSortir.Length} dialog)" : "❌ NULL")}");
+        }
+        
         bool adaBriefing = (briefingScript != null && 
                            dataLevelIni != null && 
                            dataLevelIni.barisDialogSortir != null && 
                            dataLevelIni.barisDialogSortir.Length > 0);
 
+        Debug.Log($"   HASIL: {(adaBriefing ? "✅ ADA BRIEFING" : "❌ TIDAK ADA BRIEFING")}");
+
         if (adaBriefing)
         {
-            Debug.Log("[3] Memulai Briefing...");
+            Debug.Log("[3a] Path: BRIEFING MODE");
             briefingScript.SetupSequenceKhusus(dataLevelIni, dataLevelIni.barisDialogSortir);
 
             if (briefingScript.tombolMulai != null)
             {
+                Debug.Log("✅ Tombol Mulai ditemukan - Listener diset ke BukaPanduanSortir()");
                 briefingScript.tombolMulai.onClick.RemoveAllListeners();
-                briefingScript.tombolMulai.onClick.AddListener(MulaiMain);
+                briefingScript.tombolMulai.onClick.AddListener(BukaPanduanSortir);
+            }
+            else
+            {
+                Debug.LogError("❌ briefingScript.tombolMulai NULL!");
             }
 
-            // BEKUKAN WAKTU UNTUK BRIEFING (Hanya jika briefing siap)
             Time.timeScale = 0;
+            Debug.Log("⏸️ Time.timeScale = 0 (Pause untuk briefing)");
         }
         else
         {
-            Debug.Log("[3] Tidak ada Briefing. Langsung main.");
-            MulaiMain();
+            Debug.Log("[3b] Path: SKIP BRIEFING - Langsung ke Sorting Guide");
+            Debug.Log("🚀 Memanggil BukaPanduanSortir() langsung...");
+            BukaPanduanSortir();
         }
+        
+        Debug.Log("==================================================");
     }
 
+    /// <summary>
+    /// Buka Sorting Guide Panel setelah briefing selesai
+    /// Dipanggil oleh tombol "Mulai" di Briefing
+    /// </summary>
+    public void BukaPanduanSortir()
+    {
+        Debug.Log("==================================================");
+        Debug.Log("[BRIEFING → GUIDE] BukaPanduanSortir() DIPANGGIL");
+        Debug.Log($"⏱️ Time.timeScale saat ini: {Time.timeScale}");
+        
+        // Matikan panel briefing
+        if (briefingScript != null)
+        {
+            Debug.Log("🔴 Mematikan Panel Briefing...");
+            briefingScript.panelDialog.SetActive(false);
+            if (briefingScript.panelIntro != null) 
+            {
+                briefingScript.panelIntro.SetActive(false);
+            }
+            Debug.Log("✅ Panel Briefing dimatikan");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ briefingScript NULL!");
+        }
+        
+        // Nyalakan Sorting Guide Panel
+        if (panelSortingGuide != null)
+        {
+            Debug.Log($"🟢 Menyalakan Panel Sorting Guide (sebelum: {panelSortingGuide.activeSelf})...");
+            panelSortingGuide.SetActive(true);
+            Debug.Log($"✅ Sorting Guide Panel ditampilkan (sekarang: {panelSortingGuide.activeSelf})");
+        }
+        else
+        {
+            Debug.LogError("❌ panelSortingGuide NULL! Tidak di-assign di Inspector! Langsung main.");
+            MulaiMain();
+            return;
+        }
+        
+        // PENTING: Time.timeScale tetap 0 karena game belum mulai
+        Debug.Log($"⏸️ Time.timeScale tetap: {Time.timeScale} (Game masih pause)");
+        Debug.Log("📋 Menunggu user klik tombol 'Lanjut' di Sorting Guide...");
+        Debug.Log("==================================================");
+    }
+
+    /// <summary>
+    /// Mulai game (spawner, timer, unpause)
+    /// Dipanggil oleh tombol "Lanjut" di Sorting Guide Panel
+    /// </summary>
     public void MulaiMain()
     {
-        Debug.Log("[GAME START] Game Dimulai.");
+        Debug.Log("==================================================");
+        Debug.Log("[GAME START] MulaiMain() DIPANGGIL");
+        Debug.Log($"⏱️ Time.timeScale sebelum: {Time.timeScale}");
+        
+        // Matikan Sorting Guide Panel
+        if (panelSortingGuide != null) 
+        {
+            Debug.Log($"🔴 Mematikan Sorting Guide Panel (sebelum: {panelSortingGuide.activeSelf})...");
+            panelSortingGuide.SetActive(false);
+            Debug.Log($"✅ Panel dimatikan (sekarang: {panelSortingGuide.activeSelf})");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ panelSortingGuide NULL saat MulaiMain!");
+        }
+        
         Time.timeScale = 1; // Pastikan waktu jalan
+        Debug.Log($"▶️ Time.timeScale diset ke: {Time.timeScale}");
 
         // Hilangkan UI Briefing
         if (briefingScript != null)
         {
             briefingScript.panelDialog.SetActive(false);
             if (briefingScript.panelIntro != null) briefingScript.panelIntro.SetActive(false);
+            Debug.Log("✅ UI Briefing dimatikan");
         }
 
         // Nyalakan Spawner
-        if (mesinSpawner != null) mesinSpawner.enabled = true;
+        if (mesinSpawner != null) 
+        {
+            mesinSpawner.enabled = true;
+            Debug.Log("✅ WasteSpawner diaktifkan");
+        }
+        else
+        {
+            Debug.LogError("❌ mesinSpawner NULL!");
+        }
 
         // Mulai Timer di GameManager
-        if (GameManager.Instance != null) GameManager.Instance.MulaiLevel();
+        if (GameManager.Instance != null) 
+        {
+            GameManager.Instance.MulaiLevel();
+            Debug.Log("✅ GameManager.MulaiLevel() dipanggil");
+        }
+        else
+        {
+            Debug.LogError("❌ GameManager.Instance NULL!");
+        }
+        
+        Debug.Log("🎮 GAME STARTED - Sampah mulai spawn!");
+        Debug.Log("==================================================");
     }
 
     /// <summary>

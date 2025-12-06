@@ -134,9 +134,22 @@ public class BriefingSequence : MonoBehaviour
         {
             tombolMulai.gameObject.SetActive(true);
             
-            // Setup event tombol Mulai
-            tombolMulai.onClick.RemoveAllListeners();
-            tombolMulai.onClick.AddListener(OnTombolMulaiDiklik);
+            // PENTING: JANGAN override listener yang sudah di-set oleh ProcessingLevelManager
+            // ProcessingLevelManager sudah set listener ke BukaPanduanSortir()
+            // Cek apakah listener sudah ada (persistent listener count > 0)
+            int listenerCount = tombolMulai.onClick.GetPersistentEventCount();
+            
+            if (listenerCount == 0)
+            {
+                // Jika belum ada listener (fallback untuk backward compatibility)
+                Debug.LogWarning("[BRIEFING] Tidak ada listener di tombol Mulai. Menggunakan fallback OnTombolMulaiDiklik()");
+                tombolMulai.onClick.RemoveAllListeners();
+                tombolMulai.onClick.AddListener(OnTombolMulaiDiklik);
+            }
+            else
+            {
+                Debug.Log($"[BRIEFING] Listener sudah diset oleh ProcessingLevelManager ({listenerCount} listener). Tidak di-override.");
+            }
             
             Debug.Log("[BRIEFING] Tombol Mulai Dimunculkan.");
         }

@@ -22,14 +22,21 @@ public class SortingGuideUI : MonoBehaviour
     [Tooltip("Prefab Image kosong dengan komponen Image untuk menampilkan icon sampah")]
     public GameObject iconPrefab;
 
-    void Start()
+    void OnEnable()
     {
-        // Pause game agar pemain punya waktu membaca panduan
-        Time.timeScale = 0f;
-        Debug.Log("📋 Sorting Guide ditampilkan - Game di-pause");
+        Debug.Log("==================================================");
+        Debug.Log("[SORTING GUIDE] OnEnable() DIPANGGIL");
+        Debug.Log($"⏱️ Time.timeScale: {Time.timeScale}");
+        Debug.Log($"📦 panelGuide assigned: {(panelGuide != null ? "YES" : "NULL")}");
+        Debug.Log($"🟢 containerOrganik assigned: {(containerOrganik != null ? "YES" : "NULL")}");
+        Debug.Log($"🟡 containerAnorganik assigned: {(containerAnorganik != null ? "YES" : "NULL")}");
+        Debug.Log($"🔴 containerB3 assigned: {(containerB3 != null ? "YES" : "NULL")}");
+        Debug.Log($"📋 iconPrefab assigned: {(iconPrefab != null ? "YES" : "NULL")}");
 
         // Populate guide dengan icon sampah dari inventory
         PopulateGuide();
+        
+        Debug.Log("==================================================");
     }
 
     /// <summary>
@@ -135,21 +142,28 @@ public class SortingGuideUI : MonoBehaviour
     }
 
     /// <summary>
-    /// Tutup panel guide dan lanjutkan game
+    /// Tutup panel guide dan panggil ProcessingLevelManager.MulaiMain()
     /// Dipanggil oleh tombol "Mengerti" / "Lanjut"
     /// </summary>
     public void TutupGuide()
     {
-        Debug.Log("✅ Sorting Guide ditutup - Game dilanjutkan");
+        Debug.Log("==================================================");
+        Debug.Log("[SORTING GUIDE] TutupGuide() DIPANGGIL (Tombol Lanjut diklik)");
+        Debug.Log($"⏱️ Time.timeScale sebelum: {Time.timeScale}");
 
-        // Matikan panel
-        if (panelGuide != null)
+        // Panggil ProcessingLevelManager untuk mulai game
+        if (ProcessingLevelManager.Instance != null)
         {
-            panelGuide.SetActive(false);
+            Debug.Log("✅ ProcessingLevelManager.Instance ditemukan");
+            Debug.Log("🚀 Memanggil ProcessingLevelManager.MulaiMain()...");
+            ProcessingLevelManager.Instance.MulaiMain();
         }
-
-        // Lanjutkan game
-        Time.timeScale = 1f;
+        else
+        {
+            Debug.LogError("❌ ProcessingLevelManager.Instance NULL! Tidak bisa mulai game.");
+        }
+        
+        Debug.Log("==================================================");
     }
 
     /// <summary>

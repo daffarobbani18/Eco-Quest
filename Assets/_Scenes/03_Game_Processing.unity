@@ -1056,6 +1056,7 @@ MonoBehaviour:
   panelLoseSceneIni: {fileID: 1311368577}
   textSkorAkhirScene2: {fileID: 1462212525}
   textWaktuAkhirScene2: {fileID: 2019076791}
+  panelSortingGuide: {fileID: 2123230181}
   textSkorHUD: {fileID: 0}
   textTimerHUD: {fileID: 0}
 --- !u!4 &452329883
@@ -2617,7 +2618,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2876198482454141796, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3627496918445286529, guid: 5b9c5b6b06a9b0b4db66885ad8943faf, type: 3}
       propertyPath: m_SizeDelta.x
@@ -3591,10 +3592,10 @@ RectTransform:
   - {fileID: 1879941235}
   - {fileID: 1110529349}
   - {fileID: 691861284}
+  - {fileID: 2123230182}
   - {fileID: 1352064493}
   - {fileID: 1751812991}
   - {fileID: 1311368578}
-  - {fileID: 2123230182}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -4302,7 +4303,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2123230182
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4372,7 +4373,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2123230181}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4decaacdc59b138429a9d76eabed8520, type: 3}
   m_Name: 
@@ -4381,7 +4382,7 @@ MonoBehaviour:
   containerOrganik: {fileID: 785723534}
   containerAnorganik: {fileID: 1576520631}
   containerB3: {fileID: 789518096}
-  iconPrefab: {fileID: 6689614784155314153, guid: 6ff7563ed1ef09745bfb8ad46d377ec9, type: 3}
+  iconPrefab: {fileID: 1725150658453008104, guid: f561b6dea5b3ef343a7db435afc8a493, type: 3}
 --- !u!1 &2145313689
 GameObject:
   m_ObjectHideFlags: 0
