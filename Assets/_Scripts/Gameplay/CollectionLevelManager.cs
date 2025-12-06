@@ -1,14 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System.Collections; // Untuk IEnumerator
 
 public class CollectionLevelManager : MonoBehaviour
 {
     public static CollectionLevelManager Instance;
 
-    // --- HAPUS BAGIAN UI BRIEFING DI SINI ---
-    // Kita hapus referensi ke Text Judul, Deskripsi, dll.
-    // Biarkan BriefingSequence yang mengurusnya.
+    [Header("Referensi Sistem")]
+    public BriefingSequence briefingScript;
 
     [Header("UI Selesai (Akhir)")]
     public GameObject panelSelesai;
@@ -31,40 +31,49 @@ public class CollectionLevelManager : MonoBehaviour
         Time.timeScale = 1;
     }
 
-    void Start()
+    IEnumerator Start()
     {
+        Debug.Log("==================================================");
+        Debug.Log("[CollectionLevelManager] START");
+        
         // Set index level untuk progression system
         if (GameManager.Instance != null)
         {
             GameManager.Instance.SetIndexLevel(urutanLevel);
-            Debug.Log($"[CollectionLevelManager] Level Index diset ke: {urutanLevel}");
+            Debug.Log($"✅ Level Index diset ke: {urutanLevel}");
         }
         
         // Setup Data Sampah
         CollectionItem[] semuaSampah = FindObjectsOfType<CollectionItem>();
         totalSampahDiScene = semuaSampah.Length;
         sampahTerkumpul = 0;
+        Debug.Log($"✅ Total sampah di scene: {totalSampahDiScene}");
 
         // Matikan Panel Selesai
         if (panelSelesai != null) panelSelesai.SetActive(false);
 
-        // --- LOGIKA BRIEFING DIPINDAHKAN ---
-        // Kita tidak lagi menyalakan panel di sini.
-        // Kita biarkan script 'BriefingSequence' yang membacanya dari 'Start'-nya sendiri.
-
-        // Default: Game terkunci sampai tombol Mulai ditekan di BriefingSequence
+        // Default: Game terkunci sampai tombol Mulai ditekan
         isGamePlaying = false;
+        
+        Debug.Log("⏸️ Game terkunci. Menunggu briefing selesai...");
+        Debug.Log("==================================================");
+        
+        // Listener akan di-setup oleh BriefingSequence.SelesaiDialog()
+        // Tidak perlu setup di sini karena button belum muncul
+        yield break;
     }
 
     // Fungsi ini dipanggil oleh Tombol "SIAP!" di Panel Dialog (via BriefingSequence)
     public void MulaiMain()
     {
-        // --- HAPUS BARIS YANG ERROR INI: ---
-        // if(panelBriefing != null) panelBriefing.SetActive(false); 
-        // -----------------------------------
-
+        Debug.Log("==================================================");
+        Debug.Log("[COLLECTION] MulaiMain() DIPANGGIL");
+        
         isGamePlaying = true;
-        Debug.Log("GAME DIMULAI! (Pemain sekarang bisa klik sampah)");
+        
+        Debug.Log("✅ isGamePlaying = true");
+        Debug.Log("🎮 GAME DIMULAI! Pemain sekarang bisa klik sampah");
+        Debug.Log("==================================================");
     }
 
     public void LaporSampahTerambil()

@@ -134,24 +134,26 @@ public class BriefingSequence : MonoBehaviour
         {
             tombolMulai.gameObject.SetActive(true);
             
-            // PENTING: JANGAN override listener yang sudah di-set oleh ProcessingLevelManager
-            // ProcessingLevelManager sudah set listener ke BukaPanduanSortir()
-            // Cek apakah listener sudah ada (persistent listener count > 0)
-            int listenerCount = tombolMulai.onClick.GetPersistentEventCount();
+            // Setup listener di sini (button baru muncul, listener belum di-set)
+            // Cek scene dan set listener yang sesuai
+            tombolMulai.onClick.RemoveAllListeners();
             
-            if (listenerCount == 0)
+            if (CollectionLevelManager.Instance != null)
             {
-                // Jika belum ada listener (fallback untuk backward compatibility)
-                Debug.LogWarning("[BRIEFING] Tidak ada listener di tombol Mulai. Menggunakan fallback OnTombolMulaiDiklik()");
-                tombolMulai.onClick.RemoveAllListeners();
-                tombolMulai.onClick.AddListener(OnTombolMulaiDiklik);
+                // Scene Collection (Kantin/Lab IPA)
+                tombolMulai.onClick.AddListener(CollectionLevelManager.Instance.MulaiMain);
+                Debug.Log("[BRIEFING] Tombol Mulai dimunculkan - Listener: CollectionLevelManager.MulaiMain");
+            }
+            else if (ProcessingLevelManager.Instance != null)
+            {
+                // Scene Processing
+                tombolMulai.onClick.AddListener(ProcessingLevelManager.Instance.BukaPanduanSortir);
+                Debug.Log("[BRIEFING] Tombol Mulai dimunculkan - Listener: ProcessingLevelManager.BukaPanduanSortir");
             }
             else
             {
-                Debug.Log($"[BRIEFING] Listener sudah diset oleh ProcessingLevelManager ({listenerCount} listener). Tidak di-override.");
+                Debug.LogError("[BRIEFING] Tidak ada LevelManager ditemukan! Listener tidak bisa diset.");
             }
-            
-            Debug.Log("[BRIEFING] Tombol Mulai Dimunculkan.");
         }
     }
 

@@ -139,16 +139,8 @@ public class ProcessingLevelManager : MonoBehaviour
             Debug.Log("[3a] Path: BRIEFING MODE");
             briefingScript.SetupSequenceKhusus(dataLevelIni, dataLevelIni.barisDialogSortir);
 
-            if (briefingScript.tombolMulai != null)
-            {
-                Debug.Log("✅ Tombol Mulai ditemukan - Listener diset ke BukaPanduanSortir()");
-                briefingScript.tombolMulai.onClick.RemoveAllListeners();
-                briefingScript.tombolMulai.onClick.AddListener(BukaPanduanSortir);
-            }
-            else
-            {
-                Debug.LogError("❌ briefingScript.tombolMulai NULL!");
-            }
+            // Listener akan di-setup otomatis oleh BriefingSequence.SelesaiDialog()
+            Debug.Log("⏸️ Listener akan diset oleh BriefingSequence saat dialog selesai");
 
             Time.timeScale = 0;
             Debug.Log("⏸️ Time.timeScale = 0 (Pause untuk briefing)");
