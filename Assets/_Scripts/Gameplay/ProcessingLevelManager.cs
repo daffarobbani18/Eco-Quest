@@ -17,6 +17,9 @@ public class ProcessingLevelManager : MonoBehaviour
     
     [Tooltip("Isi 1 untuk Kantin, 2 untuk Lab IPA, 3 untuk Gudang")]
     public int urutanLevel = 1;
+    
+    [Tooltip("Nama scene tujuan level selanjutnya (kosongkan jika level terakhir)")]
+    public string namaSceneSelanjutnya = "";
 
     [Header("UI Scene Ini (Wajib Diisi di Inspector)")]
     public GameObject panelWinScene2;
@@ -138,5 +141,41 @@ public class ProcessingLevelManager : MonoBehaviour
 
         // Mulai Timer di GameManager
         if (GameManager.Instance != null) GameManager.Instance.MulaiLevel();
+    }
+
+    /// <summary>
+    /// Navigasi ke level selanjutnya
+    /// Dipanggil oleh tombol "Next Level" / "Lanjut" di Panel Win
+    /// </summary>
+    public void KeLevelSelanjutnya()
+    {
+        // PENTING: Reset time scale agar scene baru tidak freeze
+        Time.timeScale = 1f;
+        
+        // Cek apakah ada scene selanjutnya
+        if (!string.IsNullOrEmpty(namaSceneSelanjutnya))
+        {
+            Debug.Log($"➡️ Lanjut ke level berikutnya: {namaSceneSelanjutnya}");
+            
+            // Clear inventory untuk mulai fresh di level baru
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ClearInventory();
+            }
+            
+            SceneManager.LoadScene(namaSceneSelanjutnya);
+        }
+        else
+        {
+            // Jika kosong (level terakhir), kembali ke Hub
+            Debug.Log("🏁 Level terakhir selesai! Kembali ke Hub.");
+            
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ClearInventory();
+            }
+            
+            SceneManager.LoadScene("01_Hub_Klub");
+        }
     }
 }
