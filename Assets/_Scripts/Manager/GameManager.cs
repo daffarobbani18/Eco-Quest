@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     [Header("UI References (Akan berubah tiap scene)")]
     public GameObject winPanel;       // Panel Menang
+    public GameObject losePanel;      // Panel Kalah (Game Over)
     public TMP_Text textSkorAkhir;    // Teks Skor di Panel Menang
     public TMP_Text textWaktuAkhir;   // Teks Waktu di Panel Menang
 
@@ -57,7 +58,7 @@ public class GameManager : MonoBehaviour
 
     // --- FUNGSI BARU (PENTING): UPDATE SETTING SAAT PINDAH SCENE ---
     // Fungsi ini dipanggil oleh ProcessingLevelManager saat scene Pengolahan dimulai
-    public void SetupLevelBaru(bool pakaiTimer, int targetSampah, float durasi, GameObject panelWin, TMP_Text txtSkor, TMP_Text txtWaktu)
+    public void SetupLevelBaru(bool pakaiTimer, int targetSampah, float durasi, GameObject panelWin, GameObject panelLose, TMP_Text txtSkor, TMP_Text txtWaktu)
     {
         Debug.Log("GameManager: Setup Level Baru dimulai...");
 
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour
         // 2. Sambungkan UI Scene Baru
         // Karena pindah scene, referensi UI lama hilang, jadi kita update dengan yang baru dikirim LevelManager
         winPanel = panelWin;
+        losePanel = panelLose;
         textSkorAkhir = txtSkor;
         textWaktuAkhir = txtWaktu;
 
@@ -153,8 +155,50 @@ public class GameManager : MonoBehaviour
     public void KurangiSkor(int nilai)
     {
         totalSkor -= nilai;
-        if (totalSkor < 0) totalSkor = 0;
         UpdateUI();
+        
+        // Cek Game Over jika skor negatif
+        if (totalSkor < 0)
+        {
+            Debug.Log("💀 GAME OVER! Skor turun di bawah 0!");
+            TriggerGameOver();
+        }
+    }
+
+    public void TriggerGameOver()
+    {
+        // Jangan trigger lagi jika sudah tidak aktif
+        if (!isGameActive) return;
+        
+        isGameActive = false;
+        Debug.Log("💀 TRIGGER GAME OVER - SKOR NEGATIF!");
+        
+        // Matikan win panel (jaga-jaga)
+        if (winPanel != null)
+        {
+            winPanel.SetActive(false);
+        }
+        
+        // Munculkan lose panel
+        if (losePanel != null)
+        {
+            losePanel.SetActive(true);
+            
+            // Update text skor akhir (jika ada text di lose panel)
+            if (textSkorAkhir != null)
+            {
+                textSkorAkhir.text = "Skor Akhir: " + totalSkor;
+            }
+            
+            Debug.Log("📊 Panel Game Over ditampilkan dengan skor: " + totalSkor);
+        }
+        else
+        {
+            Debug.LogError("❌ losePanel NULL! Panel tidak bisa ditampilkan saat Game Over.");
+        }
+        
+        // Hentikan waktu (freeze game)
+        Time.timeScale = 0;
     }
 
     public void KurangiJumlahSampah()

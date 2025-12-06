@@ -353,6 +353,7 @@ MonoBehaviour:
   totalSampahLevelIni: 0
   indexLevelSaatIni: 0
   winPanel: {fileID: 0}
+  losePanel: {fileID: 0}
   textSkorAkhir: {fileID: 0}
   textWaktuAkhir: {fileID: 0}
   scoreTextUI: {fileID: 0}
@@ -3736,7 +3737,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4737456287705232769, guid: ac18978709016144aa21ee8dbccfca8d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7416058745465494075, guid: ac18978709016144aa21ee8dbccfca8d, type: 3}
       propertyPath: m_Pivot.x
@@ -3881,7 +3882,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8293623298568018448, guid: cbca7449c0f416143a4816cd133cacce, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

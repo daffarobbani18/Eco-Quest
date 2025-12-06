@@ -20,6 +20,7 @@ public class ProcessingLevelManager : MonoBehaviour
 
     [Header("UI Scene Ini (Wajib Diisi di Inspector)")]
     public GameObject panelWinScene2;
+    public GameObject panelLoseSceneIni;
     public TMP_Text textSkorAkhirScene2;
     public TMP_Text textWaktuAkhirScene2;
     
@@ -63,6 +64,7 @@ public class ProcessingLevelManager : MonoBehaviour
                 targetSampah,
                 dataLevelIni.batasWaktuDetik,
                 panelWinScene2,
+                panelLoseSceneIni,
                 textSkorAkhirScene2,
                 textWaktuAkhirScene2
             );

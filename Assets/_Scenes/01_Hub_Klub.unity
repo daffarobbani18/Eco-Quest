@@ -1659,9 +1659,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelIndex: 2
-  sceneName: 01_Hub_Klub
-  padlockOverlay: {fileID: 0}
-  buttonComponent: {fileID: 0}
+  sceneName: 02_Lab_IPA
+  padlockOverlay: {fileID: 98550538}
+  buttonComponent: {fileID: 884217153}
   sfxSource: {fileID: 2147156679}
   paperSound: {fileID: 8300000, guid: 0e0669baadeb124478ad99619501a4e7, type: 3}
   lockedSound: {fileID: 8300000, guid: d21a4e3c8c67b5e438e465ee0cfabfca, type: 3}
