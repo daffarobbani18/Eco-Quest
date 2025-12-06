@@ -2903,7 +2903,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1364455402}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2123230186}
+        m_TargetAssemblyTypeName: SortingGuideUI, Assembly-CSharp
+        m_MethodName: TutupGuide
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1364455402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4283,7 +4295,7 @@ GameObject:
   - component: {fileID: 2123230182}
   - component: {fileID: 2123230185}
   - component: {fileID: 2123230184}
-  - component: {fileID: 2123230183}
+  - component: {fileID: 2123230186}
   m_Layer: 5
   m_Name: Panel_SortingGuide
   m_TagString: Untagged
@@ -4315,18 +4327,6 @@ RectTransform:
   m_AnchoredPosition: {x: -959.9937, y: -540.0522}
   m_SizeDelta: {x: -1908.8727, y: -1073.3364}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2123230183
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2123230181}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 848264a3b19283245872f47e48f38409, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &2123230184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4365,6 +4365,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2123230181}
   m_CullTransparentMesh: 1
+--- !u!114 &2123230186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2123230181}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4decaacdc59b138429a9d76eabed8520, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panelGuide: {fileID: 2123230181}
+  containerOrganik: {fileID: 785723534}
+  containerAnorganik: {fileID: 1576520631}
+  containerB3: {fileID: 789518096}
+  iconPrefab: {fileID: 6689614784155314153, guid: 6ff7563ed1ef09745bfb8ad46d377ec9, type: 3}
 --- !u!1 &2145313689
 GameObject:
   m_ObjectHideFlags: 0
