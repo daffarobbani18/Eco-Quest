@@ -30,6 +30,25 @@ public class GameManager : MonoBehaviour
     // INVENTARIS (Penting untuk dibawa antar scene)
     public List<WasteData> trashInventory;
 
+    // ============ JUDGMENT PHASE - TRACKING KESALAHAN PER TONG ============
+    // Dictionary: Key = Tipe Tong yang SALAH TERIMA sampah, Value = List sampah yang masuk
+    // Contoh: mistakesByBin[WasteType.B3] = { ApelData, KulitPisangData }
+    public Dictionary<WasteType, List<WasteData>> mistakesByBin = new Dictionary<WasteType, List<WasteData>>()
+    {
+        { WasteType.Organik, new List<WasteData>() },
+        { WasteType.Anorganik, new List<WasteData>() },
+        { WasteType.B3, new List<WasteData>() }
+    };
+    
+    // HashSet untuk deduplication per tong (jangan record 5x Apel ke B3)
+    private Dictionary<WasteType, HashSet<string>> recordedMistakesPerBin = new Dictionary<WasteType, HashSet<string>>()
+    {
+        { WasteType.Organik, new HashSet<string>() },
+        { WasteType.Anorganik, new HashSet<string>() },
+        { WasteType.B3, new HashSet<string>() }
+    };
+    // ======================================================================
+
     void Awake()
     {
         // 1. SINGLETON ABADI
@@ -212,6 +231,18 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("🎉 WIN CONDITION TERCAPAI! Memanggil LevelSelesai()...");
             LevelSelesai();
+            
+            // ⭐ Trigger Judgment Phase di ProcessingLevelManager
+            if (ProcessingLevelManager.Instance != null)
+            {
+                ProcessingLevelManager.Instance.StartJudgmentPhase();
+            }
+            else
+            {
+                // Fallback jika tidak di scene Processing (misalnya testing)
+                Debug.LogWarning("⚠️ ProcessingLevelManager tidak ditemukan. Langsung tampilkan Win Panel.");
+                ShowWinPanel();
+            }
         }
     }
 
@@ -240,39 +271,13 @@ public class GameManager : MonoBehaviour
         }
         // =========================================================
         
-        // Debug: Cek apakah winPanel NULL
-        if (winPanel == null)
-        {
-            Debug.LogError("❌ ERROR: winPanel NULL! Panel Win tidak bisa ditampilkan!");
-            Debug.LogError("   Pastikan Panel Win di-link di ProcessingLevelManager Inspector.");
-            return;
-        }
+        // ⭐ JUDGMENT PHASE: Delegate ke ProcessingLevelManager
+        // Jangan langsung tampilkan Win Panel, biar PLM yang handle
+        // (PLM akan cek mistakes dulu, tampilkan slideshow, baru Win Panel)
+        Debug.Log("📋 LevelSelesai() selesai. Menunggu ProcessingLevelManager untuk Judgment Phase...");
         
-        Debug.Log($"✅ winPanel ditemukan: {winPanel.name}. Mengaktifkan panel...");
-
-        if (winPanel != null)
-        {
-            winPanel.SetActive(true);
-
-            if (textSkorAkhir != null)
-                textSkorAkhir.text = "Skor Akhir: " + totalSkor;
-
-            if (textWaktuAkhir != null && levelPakaiTimer)
-            {
-                // Hitung waktu terpakai
-                float terpakai = waktuAwal - sisaWaktu;
-                int min = Mathf.FloorToInt(terpakai / 60F);
-                int sec = Mathf.FloorToInt(terpakai % 60);
-                textWaktuAkhir.text = string.Format("Waktu: {0:00}:{1:00}", min, sec);
-            }
-            else if (textWaktuAkhir != null)
-            {
-                textWaktuAkhir.text = "Selesai!";
-            }
-        }
-
-        // Matikan waktu physics saat menang
-        Time.timeScale = 0;
+        // JANGAN Freeze Time di sini, biar Judgment Slideshow bisa jalan
+        // Time.timeScale = 0; // <-- DIHAPUS/DIPINDAH ke ShowWinPanel()
     }
 
     void GameOver()
@@ -356,4 +361,118 @@ public class GameManager : MonoBehaviour
     {
         if (trashInventory != null) trashInventory.Clear();
     }
+
+    // ============ JUDGMENT PHASE - WIN PANEL & TRACKING ============
+    
+    /// <summary>
+    /// Tampilkan Win Panel (dipanggil setelah Judgment Slideshow selesai atau skip)
+    /// </summary>
+    public void ShowWinPanel()
+    {
+        Debug.Log("==================================================");
+        Debug.Log("[SHOW WIN PANEL] Menampilkan Panel Menang");
+        
+        // Debug: Cek apakah winPanel NULL
+        if (winPanel == null)
+        {
+            Debug.LogError("❌ ERROR: winPanel NULL! Panel Win tidak bisa ditampilkan!");
+            Debug.LogError("   Pastikan Panel Win di-link di ProcessingLevelManager Inspector.");
+            return;
+        }
+        
+        Debug.Log($"✅ winPanel ditemukan: {winPanel.name}. Mengaktifkan panel...");
+
+        winPanel.SetActive(true);
+
+        if (textSkorAkhir != null)
+            textSkorAkhir.text = "Skor Akhir: " + totalSkor;
+
+        if (textWaktuAkhir != null && levelPakaiTimer)
+        {
+            // Hitung waktu terpakai
+            float terpakai = waktuAwal - sisaWaktu;
+            int min = Mathf.FloorToInt(terpakai / 60F);
+            int sec = Mathf.FloorToInt(terpakai % 60);
+            textWaktuAkhir.text = string.Format("Waktu: {0:00}:{1:00}", min, sec);
+        }
+        else if (textWaktuAkhir != null)
+        {
+            textWaktuAkhir.text = "Selesai!";
+        }
+
+        // Matikan waktu physics saat menang
+        Time.timeScale = 0;
+        
+        Debug.Log("✅ Win Panel ditampilkan!");
+        Debug.Log("==================================================");
+    }
+    
+    /// <summary>
+    /// Catat kesalahan pemilahan sampah (dipanggil oleh DragController)
+    /// System: Track sampah yang SALAH MASUK ke setiap tong
+    /// Deduplication: Hanya catat 1x per jenis sampah per tong
+    /// </summary>
+    public void RecordMistake(WasteType wrongBinType, WasteData wasteData)
+    {
+        // Cek deduplication: apakah sampah ini sudah tercatat di tong ini?
+        if (recordedMistakesPerBin[wrongBinType].Contains(wasteData.namaSampah))
+        {
+            Debug.Log($"⚠️ [JUDGMENT] '{wasteData.namaSampah}' sudah dicatat di Tong {wrongBinType}. Skip duplicate.");
+            return;
+        }
+        
+        // Catat sampah ke tong yang salah terima
+        mistakesByBin[wrongBinType].Add(wasteData);
+        recordedMistakesPerBin[wrongBinType].Add(wasteData.namaSampah);
+        
+        Debug.Log($"❌ [JUDGMENT] Tong {wrongBinType} salah terima: {wasteData.namaSampah} (Seharusnya: {wasteData.tipeSampah})");
+        Debug.Log($"📊 [JUDGMENT] Tong {wrongBinType} total salah terima: {mistakesByBin[wrongBinType].Count} sampah");
+    }
+    
+    /// <summary>
+    /// Bersihkan semua data kesalahan (dipanggil saat mulai level baru)
+    /// </summary>
+    public void ClearMistakes()
+    {
+        // Clear semua list di Dictionary
+        foreach (var list in mistakesByBin.Values)
+        {
+            list.Clear();
+        }
+        
+        // Clear semua HashSet deduplication
+        foreach (var set in recordedMistakesPerBin.Values)
+        {
+            set.Clear();
+        }
+        
+        Debug.Log("🧹 [JUDGMENT] Data kesalahan dibersihkan untuk semua tong");
+    }
+    
+    /// <summary>
+    /// Cek apakah ada kesalahan yang tercatat di semua tong
+    /// </summary>
+    public bool HasMistakes()
+    {
+        foreach (var list in mistakesByBin.Values)
+        {
+            if (list.Count > 0) return true;
+        }
+        return false;
+    }
+    
+    /// <summary>
+    /// Get total jumlah tong yang kena salah pilah
+    /// </summary>
+    public int GetAffectedBinCount()
+    {
+        int count = 0;
+        foreach (var list in mistakesByBin.Values)
+        {
+            if (list.Count > 0) count++;
+        }
+        return count;
+    }
+    
+    // ======================================================================
 }

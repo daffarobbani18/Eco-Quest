@@ -31,6 +31,10 @@ public class ProcessingLevelManager : MonoBehaviour
     [Tooltip("Panel panduan sortir yang muncul setelah briefing")]
     public GameObject panelSortingGuide;
     
+    [Header("Judgment Phase System")]
+    [Tooltip("Script JudgmentSlideshow untuk menampilkan kesalahan edukatif")]
+    public JudgmentSlideshow judgmentSlideshow;
+    
     [Header("UI HUD (Optional - Untuk Manual Linking)")]
     [Tooltip("Opsional: Drag Text_Skor jika auto-find gagal")]
     public TMP_Text textSkorHUD;
@@ -257,6 +261,56 @@ public class ProcessingLevelManager : MonoBehaviour
         }
         
         Debug.Log("🎮 GAME STARTED - Sampah mulai spawn!");
+        Debug.Log("==================================================");
+        
+        // Clear mistakes dari level sebelumnya (jika ada)
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ClearMistakes();
+            Debug.Log("🧹 Data kesalahan dibersihkan untuk level baru");
+        }
+    }
+
+    /// <summary>
+    /// ⭐ JUDGMENT PHASE: Mulai slideshow kesalahan edukatif
+    /// Dipanggil oleh GameManager.KurangiJumlahSampah() saat level selesai
+    /// </summary>
+    public void StartJudgmentPhase()
+    {
+        Debug.Log("==================================================");
+        Debug.Log("[JUDGMENT PHASE] START");
+        
+        // Cek apakah ada kesalahan
+        if (GameManager.Instance == null || !GameManager.Instance.HasMistakes())
+        {
+            Debug.Log("[JUDGMENT] ✅ Tidak ada kesalahan! Langsung tampilkan Win Panel.");
+            Debug.Log("==================================================");
+            GameManager.Instance?.ShowWinPanel();
+            return;
+        }
+        
+        // Ada kesalahan, tampilkan slideshow
+        int mistakeCount = GameManager.Instance.mistakesList.Count;
+        Debug.Log($"[JUDGMENT] ❌ Ditemukan {mistakeCount} kesalahan unik.");
+        
+        // Cek apakah JudgmentSlideshow ter-assign
+        if (judgmentSlideshow == null)
+        {
+            Debug.LogError("❌ judgmentSlideshow NULL! Tidak di-assign di Inspector!");
+            Debug.LogError("   Langsung tampilkan Win Panel tanpa slideshow.");
+            Debug.Log("==================================================");
+            GameManager.Instance?.ShowWinPanel();
+            return;
+        }
+        
+        Debug.Log("[JUDGMENT] 🎬 Memulai slideshow edukatif...");
+        
+        // Mulai slideshow dengan callback ke ShowWinPanel setelah selesai
+        judgmentSlideshow.StartSlideshow(() => {
+            Debug.Log("[JUDGMENT] 🎉 Slideshow selesai! Menampilkan Win Panel...");
+            GameManager.Instance?.ShowWinPanel();
+        });
+        
         Debug.Log("==================================================");
     }
 

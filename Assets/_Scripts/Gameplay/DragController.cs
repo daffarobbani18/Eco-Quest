@@ -97,6 +97,13 @@ public class DragController : MonoBehaviour
                 if (GameManager.Instance != null)
                 {
                     GameManager.Instance.KurangiSkor(myItem.dataSampah.skorSalah);
+                    
+                    // ⭐ JUDGMENT PHASE: Catat sampah yang SALAH MASUK ke tong ini
+                    // Parameter: (Tong yang salah terima, Data sampah lengkap)
+                    GameManager.Instance.RecordMistake(
+                        bin.tipeTongIni,          // Tong mana yang salah terima (contoh: Tong B3)
+                        myItem.dataSampah         // Data sampah lengkap (Apel, Organik, icon, dll)
+                    );
                 }
             }
         }
