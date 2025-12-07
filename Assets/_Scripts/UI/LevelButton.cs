@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 using System.Collections;
 
 public class LevelButton : MonoBehaviour
@@ -18,6 +19,13 @@ public class LevelButton : MonoBehaviour
     
     [Tooltip("Komponen Button dari GameObject ini")]
     public Button buttonComponent;
+    
+    [Header("Star Rating Display")]
+    [Tooltip("Array 3 GameObjects untuk icon bintang (optional)")]
+    public GameObject[] starIcons;
+    
+    [Tooltip("Text untuk display best score (optional)")]
+    public TMP_Text bestScoreText;
 
     [Header("Audio Settings")]
     [Tooltip("Referensi ke Audio Source scene")]
@@ -49,6 +57,51 @@ public class LevelButton : MonoBehaviour
         else
         {
             Debug.LogError($"❌ LevelButton [{levelIndex}]: Button component tidak ditemukan!");
+        }
+        
+        // Display saved stars & best score
+        UpdateStarDisplay();
+    }
+    
+    /// <summary>
+    /// Update display bintang dan best score dari PlayerPrefs
+    /// </summary>
+    void UpdateStarDisplay()
+    {
+        if (GameManager.Instance == null) return;
+        
+        int bestStars = GameManager.Instance.GetBestStars(levelIndex);
+        int bestScore = GameManager.Instance.GetBestScore(levelIndex);
+        
+        // Update star icons
+        if (starIcons != null && starIcons.Length >= 3)
+        {
+            for (int i = 0; i < starIcons.Length; i++)
+            {
+                if (starIcons[i] != null)
+                {
+                    // Aktifkan bintang jika pemain sudah dapat bintang tersebut
+                    starIcons[i].SetActive(i < bestStars);
+                }
+            }
+        }
+        
+        // Update best score text
+        if (bestScoreText != null)
+        {
+            if (bestScore > 0)
+            {
+                bestScoreText.text = $"Best: {bestScore}";
+            }
+            else
+            {
+                bestScoreText.text = "Not Played";
+            }
+        }
+        
+        if (bestStars > 0)
+        {
+            Debug.Log($"⭐ LevelButton [{levelIndex}]: Best Stars = {bestStars}, Best Score = {bestScore}");
         }
     }
 

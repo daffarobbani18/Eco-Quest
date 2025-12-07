@@ -362,6 +362,88 @@ public class GameManager : MonoBehaviour
         if (trashInventory != null) trashInventory.Clear();
     }
 
+    // ============ STAR RATING SYSTEM ============
+    
+    /// <summary>
+    /// Hitung bintang berdasarkan skor akhir
+    /// Sistem: 90-100 = 3★ | 75-89 = 2★ | 50-74 = 1★ | <50 = 0★
+    /// </summary>
+    public int CalculateStars()
+    {
+        if (totalSkor >= 90) return 3;
+        if (totalSkor >= 75) return 2;
+        if (totalSkor >= 50) return 1;
+        return 0;
+    }
+    
+    /// <summary>
+    /// Simpan bintang terbaik pemain untuk level tertentu
+    /// Key: "Level_{levelIndex}_Stars" (contoh: Level_1_Stars)
+    /// </summary>
+    public void SaveBestStars(int levelIndex, int newStars)
+    {
+        string key = $"Level_{levelIndex}_Stars";
+        int currentBest = PlayerPrefs.GetInt(key, 0);
+        
+        if (newStars > currentBest)
+        {
+            PlayerPrefs.SetInt(key, newStars);
+            PlayerPrefs.Save();
+            Debug.Log($"⭐ [STAR RATING] Level {levelIndex} - New Best: {newStars} bintang! (Previous: {currentBest})");
+        }
+        else
+        {
+            Debug.Log($"⭐ [STAR RATING] Level {levelIndex} - Best tetap: {currentBest} bintang (Current: {newStars})");
+        }
+    }
+    
+    /// <summary>
+    /// Simpan skor terbaik pemain untuk level tertentu
+    /// Key: "Level_{levelIndex}_BestScore"
+    /// </summary>
+    public void SaveBestScore(int levelIndex, int newScore)
+    {
+        string key = $"Level_{levelIndex}_BestScore";
+        int currentBest = PlayerPrefs.GetInt(key, 0);
+        
+        if (newScore > currentBest)
+        {
+            PlayerPrefs.SetInt(key, newScore);
+            PlayerPrefs.Save();
+            Debug.Log($"🏆 [STAR RATING] Level {levelIndex} - New High Score: {newScore}! (Previous: {currentBest})");
+        }
+    }
+    
+    /// <summary>
+    /// Ambil bintang terbaik pemain untuk level tertentu
+    /// Return: 0 jika belum pernah main level ini
+    /// </summary>
+    public int GetBestStars(int levelIndex)
+    {
+        string key = $"Level_{levelIndex}_Stars";
+        return PlayerPrefs.GetInt(key, 0);
+    }
+    
+    /// <summary>
+    /// Ambil skor terbaik pemain untuk level tertentu
+    /// Return: 0 jika belum pernah main level ini
+    /// </summary>
+    public int GetBestScore(int levelIndex)
+    {
+        string key = $"Level_{levelIndex}_BestScore";
+        return PlayerPrefs.GetInt(key, 0);
+    }
+    
+    /// <summary>
+    /// Cek apakah pemain baru memecahkan rekor pribadi
+    /// </summary>
+    public bool IsNewRecord(int levelIndex)
+    {
+        int currentStars = CalculateStars();
+        int bestStars = GetBestStars(levelIndex);
+        return currentStars > bestStars;
+    }
+    
     // ============ JUDGMENT PHASE - WIN PANEL & TRACKING ============
     
     /// <summary>
@@ -381,6 +463,21 @@ public class GameManager : MonoBehaviour
         }
         
         Debug.Log($"✅ winPanel ditemukan: {winPanel.name}. Mengaktifkan panel...");
+
+        // ====== STAR RATING CALCULATION ======
+        int stars = CalculateStars();
+        bool isRecord = IsNewRecord(indexLevelSaatIni);
+        
+        Debug.Log($"⭐ [SHOW WIN PANEL] Skor: {totalSkor} → {stars} Bintang");
+        if (isRecord)
+        {
+            Debug.Log($"🎉 [SHOW WIN PANEL] NEW RECORD untuk Level {indexLevelSaatIni}!");
+        }
+        
+        // Simpan stars & score terbaik
+        SaveBestStars(indexLevelSaatIni, stars);
+        SaveBestScore(indexLevelSaatIni, totalSkor);
+        // ======================================
 
         winPanel.SetActive(true);
 
