@@ -104,6 +104,11 @@ public class DragController : MonoBehaviour
                         bin.tipeTongIni,          // Tong mana yang salah terima (contoh: Tong B3)
                         myItem.dataSampah         // Data sampah lengkap (Apel, Organik, icon, dll)
                     );
+                    
+                    // ⚠️ PENTING: Sampah TETAP HARUS DIKURANGI meski salah pilah!
+                    // Karena sampah sudah "diproses" (walaupun salah tempat)
+                    // Tanpa ini, level tidak akan selesai sampai timer habis
+                    GameManager.Instance.KurangiJumlahSampah();
                 }
             }
         }

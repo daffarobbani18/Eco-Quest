@@ -290,8 +290,8 @@ public class ProcessingLevelManager : MonoBehaviour
         }
         
         // Ada kesalahan, tampilkan slideshow
-        int mistakeCount = GameManager.Instance.mistakesList.Count;
-        Debug.Log($"[JUDGMENT] ❌ Ditemukan {mistakeCount} kesalahan unik.");
+        int mistakeCount = GameManager.Instance.GetAffectedBinCount();
+        Debug.Log($"[JUDGMENT] ❌ Ditemukan {mistakeCount} tong yang kena kesalahan.");
         
         // Cek apakah JudgmentSlideshow ter-assign
         if (judgmentSlideshow == null)

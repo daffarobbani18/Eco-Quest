@@ -42,13 +42,38 @@ public class JudgmentSlideshow : MonoBehaviour
 
     [Header("Settings - Tampilan Sampah")]
     [Tooltip("Ukuran icon sampah yang muncul (pixel)")]
-    public float wasteIconSize = 80f;
+    public float wasteIconSize = 50f;
+    
+    [Tooltip("Posisi dasar spawn icon (offset dari center container)")]
+    public Vector2 baseIconPosition = new Vector2(0, 0);
     
     [Tooltip("Jarak acak antara icon (untuk efek menumpuk berserakan)")]
     public float randomOffsetRange = 30f;
     
     [Tooltip("Rotasi acak icon (derajat, untuk efek tidak kaku)")]
     public float randomRotationRange = 15f;
+    
+    [Header("Settings - Animasi Icon")]
+    [Tooltip("Durasi animasi spawn icon (detik)")]
+    public float iconSpawnDuration = 0.3f;
+    
+    [Tooltip("Delay antara spawn icon (detik, untuk efek berurutan)")]
+    public float iconSpawnDelay = 0.1f;
+    
+    [Tooltip("Efek spawn: Scale (membesar dari kecil), Fade (muncul transparan), Drop (jatuh dari atas)")]
+    public bool useScaleAnimation = true;
+    public bool useFadeAnimation = true;
+    public bool useDropAnimation = true;
+    
+    [Header("Settings - Animasi Idle (Melayang)")]
+    [Tooltip("Aktifkan animasi melayang setelah spawn")]
+    public bool useFloatingAnimation = true;
+    
+    [Tooltip("Jarak melayang (pixel, semakin besar semakin jauh)")]
+    public float floatingDistance = 2f;
+    
+    [Tooltip("Kecepatan melayang (semakin besar semakin cepat)")]
+    public float floatingSpeed = 1f;
 
     [Header("Settings - Timing")]
     [Tooltip("Durasi setiap slide tong marah (detik) - anak SD butuh waktu baca")]
@@ -56,6 +81,39 @@ public class JudgmentSlideshow : MonoBehaviour
     
     [Tooltip("Panel Judgment keseluruhan (parent dari semua UI)")]
     public GameObject judgmentPanel;
+    
+    [Header("UI References - Transisi Intro")]
+    [Tooltip("Panel overlay hitam untuk transisi (CanvasGroup untuk fade in/out)")]
+    public CanvasGroup panelTransisiOverlay;
+    
+    [Tooltip("Text informasi transisi (contoh: 'Ups, kamu ada salah sortir sampah...')")]
+    public TMP_Text textTransisiInfo;
+    
+    [Header("Settings - Animasi Transisi Intro")]
+    [Tooltip("Durasi fade in overlay (detik)")]
+    public float transisiFadeInDuration = 0.5f;
+    
+    [Tooltip("Durasi tampil teks transisi (detik)")]
+    public float transisiTextDuration = 2.0f;
+    
+    [Tooltip("Durasi fade out overlay (detik)")]
+    public float transisiFadeOutDuration = 0.5f;
+    
+    [Tooltip("Warna overlay transisi (default: hitam semi-transparan)")]
+    public Color transisiOverlayColor = new Color(0, 0, 0, 0.9f);
+    
+    [Header("Settings - Animasi Transisi Outro (ke Win Panel)")]
+    [Tooltip("Aktifkan transisi ke Win Panel")]
+    public bool useOutroTransition = true;
+    
+    [Tooltip("Durasi fade in outro (detik)")]
+    public float outroFadeInDuration = 0.5f;
+    
+    [Tooltip("Durasi tampil teks outro (detik)")]
+    public float outroTextDuration = 1.5f;
+    
+    [Tooltip("Durasi fade out outro (detik)")]
+    public float outroFadeOutDuration = 0.5f;
 
     // Callback setelah slideshow selesai
     private System.Action onSlideshowComplete;
@@ -81,16 +139,270 @@ public class JudgmentSlideshow : MonoBehaviour
         }
         
         int affectedBins = GameManager.Instance.GetAffectedBinCount();
-        Debug.Log($"[JUDGMENT] 😠 Ada {affectedBins} tong yang marah! Memulai slideshow...");
+        Debug.Log($"[JUDGMENT] 😠 Ada {affectedBins} tong yang marah! Memulai slideshow dengan transisi...");
         
-        // Tampilkan panel
+        // Tampilkan panel (tapi sembunyikan dulu konten utama)
         if (judgmentPanel != null)
         {
             judgmentPanel.SetActive(true);
+            
+            // Sembunyikan konten utama dulu (akan dimunculkan setelah transisi)
+            if (imageTongMarah != null) imageTongMarah.enabled = false;
+            if (textDialog != null) textDialog.enabled = false;
+            if (textProgress != null) textProgress.enabled = false;
         }
         
-        // Mulai coroutine slideshow
+        // Mulai dengan animasi transisi, lalu slideshow
+        StartCoroutine(TransitionIntroCoroutine());
+    }
+    
+    /// <summary>
+    /// Animasi transisi intro sebelum slideshow tong marah
+    /// Fade in → Tampil teks → Fade out → Mulai slideshow
+    /// </summary>
+    IEnumerator TransitionIntroCoroutine()
+    {
+        // Setup overlay transisi
+        if (panelTransisiOverlay != null)
+        {
+            // Set warna overlay (jika ada Image component)
+            Image overlayImage = panelTransisiOverlay.GetComponent<Image>();
+            if (overlayImage != null)
+            {
+                overlayImage.color = transisiOverlayColor;
+            }
+            
+            panelTransisiOverlay.alpha = 0f; // Mulai transparan
+            panelTransisiOverlay.gameObject.SetActive(true);
+        }
+        
+        // Setup teks transisi
+        if (textTransisiInfo != null)
+        {
+            // Pilih teks random yang sesuai untuk anak SD
+            string[] pesanTransisi = new string[]
+            {
+                "Ayo Kita Lihat Kesalahanmu! 👀",
+                "Ada Yang Salah Nih... 🤔",
+                "Yuk Belajar Dari Kesalahan! 📚",
+                "Tong Sampah Mau Ngomong Nih! 🗣️",
+                "Wah, Ada Yang Kurang Tepat! 😅"
+            };
+            
+            int mistakeCount = GameManager.Instance.GetAffectedBinCount();
+            textTransisiInfo.text = pesanTransisi[Random.Range(0, pesanTransisi.Length)];
+            textTransisiInfo.alpha = 0f; // Mulai transparan
+        }
+        
+        Debug.Log("[JUDGMENT TRANSISI] 🎬 Memulai animasi intro...");
+        
+        // === FASE 1: FADE IN OVERLAY ===
+        float elapsed = 0f;
+        while (elapsed < transisiFadeInDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / transisiFadeInDuration;
+            
+            if (panelTransisiOverlay != null)
+            {
+                panelTransisiOverlay.alpha = Mathf.Lerp(0f, 1f, t);
+            }
+            
+            yield return null;
+        }
+        
+        if (panelTransisiOverlay != null) panelTransisiOverlay.alpha = 1f;
+        
+        // === FASE 2: TAMPILKAN TEKS (FADE IN + SCALE) ===
+        elapsed = 0f;
+        Vector3 textStartScale = Vector3.one * 0.5f; // Mulai kecil
+        
+        while (elapsed < 0.5f) // 0.5 detik untuk animasi teks muncul
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / 0.5f;
+            float easedT = 1f - Mathf.Pow(1f - t, 3f); // Ease out cubic
+            
+            if (textTransisiInfo != null)
+            {
+                textTransisiInfo.alpha = easedT;
+                textTransisiInfo.transform.localScale = Vector3.Lerp(textStartScale, Vector3.one, easedT);
+            }
+            
+            yield return null;
+        }
+        
+        if (textTransisiInfo != null)
+        {
+            textTransisiInfo.alpha = 1f;
+            textTransisiInfo.transform.localScale = Vector3.one;
+        }
+        
+        // === FASE 3: TAHAN TEKS (BIAR ANAK SEMPAT BACA) ===
+        yield return new WaitForSecondsRealtime(transisiTextDuration);
+        
+        // === FASE 4: FADE OUT OVERLAY & TEKS ===
+        elapsed = 0f;
+        while (elapsed < transisiFadeOutDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / transisiFadeOutDuration;
+            
+            if (panelTransisiOverlay != null)
+            {
+                panelTransisiOverlay.alpha = Mathf.Lerp(1f, 0f, t);
+            }
+            
+            if (textTransisiInfo != null)
+            {
+                textTransisiInfo.alpha = Mathf.Lerp(1f, 0f, t);
+            }
+            
+            yield return null;
+        }
+        
+        // Sembunyikan overlay
+        if (panelTransisiOverlay != null)
+        {
+            panelTransisiOverlay.alpha = 0f;
+            panelTransisiOverlay.gameObject.SetActive(false);
+        }
+        
+        Debug.Log("[JUDGMENT TRANSISI] ✅ Transisi selesai! Mulai slideshow...");
+        
+        // Tampilkan konten utama
+        if (imageTongMarah != null) imageTongMarah.enabled = true;
+        if (textDialog != null) textDialog.enabled = true;
+        if (textProgress != null) textProgress.enabled = true;
+        
+        // Mulai slideshow tong marah
         StartCoroutine(ShowSlidesCoroutine());
+    }
+    
+    /// <summary>
+    /// Animasi transisi outro setelah slideshow selesai (ke Win Panel)
+    /// Sembunyikan konten → Fade in → Teks motivasi → Fade out
+    /// </summary>
+    IEnumerator TransitionOutroCoroutine()
+    {
+        // Sembunyikan konten slideshow (tong marah, dialog, dll)
+        if (imageTongMarah != null) imageTongMarah.enabled = false;
+        if (textDialog != null) textDialog.enabled = false;
+        if (textProgress != null) textProgress.enabled = false;
+        
+        // Setup overlay
+        if (panelTransisiOverlay != null)
+        {
+            Image overlayImage = panelTransisiOverlay.GetComponent<Image>();
+            if (overlayImage != null)
+            {
+                overlayImage.color = transisiOverlayColor;
+            }
+            
+            panelTransisiOverlay.alpha = 0f;
+            panelTransisiOverlay.gameObject.SetActive(true);
+        }
+        
+        // Setup teks outro (pesan motivasi/positif)
+        if (textTransisiInfo != null)
+        {
+            // Pilih teks motivasi random untuk anak SD
+            string[] pesanOutro = new string[]
+            {
+                "Bagus! Sekarang Kamu Sudah Tahu! 🎉",
+                "Hebat! Kamu Belajar Hal Baru! ⭐",
+                "Mantap! Besok Lebih Baik Lagi! 💪",
+                "Yay! Kamu Makin Pintar! 🧠",
+                "Keren! Jangan Lupa Ya! 👍"
+            };
+            
+            textTransisiInfo.text = pesanOutro[Random.Range(0, pesanOutro.Length)];
+            textTransisiInfo.alpha = 0f;
+            textTransisiInfo.transform.localScale = Vector3.one * 0.5f; // Mulai kecil
+        }
+        
+        Debug.Log("[JUDGMENT OUTRO] 🎬 Memulai animasi outro...");
+        
+        // === FASE 1: FADE IN OVERLAY ===
+        float elapsed = 0f;
+        while (elapsed < outroFadeInDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / outroFadeInDuration;
+            
+            if (panelTransisiOverlay != null)
+            {
+                panelTransisiOverlay.alpha = Mathf.Lerp(0f, 1f, t);
+            }
+            
+            yield return null;
+        }
+        
+        if (panelTransisiOverlay != null) panelTransisiOverlay.alpha = 1f;
+        
+        // === FASE 2: TAMPILKAN TEKS MOTIVASI (FADE IN + SCALE + BOUNCE) ===
+        elapsed = 0f;
+        Vector3 textStartScale = Vector3.one * 0.5f;
+        
+        while (elapsed < 0.6f) // 0.6 detik untuk animasi teks (lebih cepat dari intro)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / 0.6f;
+            
+            // Bounce effect dengan overshoot
+            float easedT = t < 0.5f 
+                ? 2f * t * t // Ease in
+                : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f; // Ease out with bounce
+            
+            if (textTransisiInfo != null)
+            {
+                textTransisiInfo.alpha = easedT;
+                
+                // Scale dengan sedikit overshoot (bounce)
+                float scaleT = Mathf.Min(easedT * 1.1f, 1f);
+                textTransisiInfo.transform.localScale = Vector3.Lerp(textStartScale, Vector3.one, scaleT);
+            }
+            
+            yield return null;
+        }
+        
+        if (textTransisiInfo != null)
+        {
+            textTransisiInfo.alpha = 1f;
+            textTransisiInfo.transform.localScale = Vector3.one;
+        }
+        
+        // === FASE 3: TAHAN TEKS (LEBIH SINGKAT DARI INTRO) ===
+        yield return new WaitForSecondsRealtime(outroTextDuration);
+        
+        // === FASE 4: FADE OUT OVERLAY & TEKS ===
+        elapsed = 0f;
+        while (elapsed < outroFadeOutDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / outroFadeOutDuration;
+            
+            if (panelTransisiOverlay != null)
+            {
+                panelTransisiOverlay.alpha = Mathf.Lerp(1f, 0f, t);
+            }
+            
+            if (textTransisiInfo != null)
+            {
+                textTransisiInfo.alpha = Mathf.Lerp(1f, 0f, t);
+            }
+            
+            yield return null;
+        }
+        
+        // Sembunyikan overlay
+        if (panelTransisiOverlay != null)
+        {
+            panelTransisiOverlay.alpha = 0f;
+            panelTransisiOverlay.gameObject.SetActive(false);
+        }
+        
+        Debug.Log("[JUDGMENT OUTRO] ✅ Transisi outro selesai! Win Panel akan muncul...");
     }
 
     /// <summary>
@@ -128,6 +440,20 @@ public class JudgmentSlideshow : MonoBehaviour
         }
         
         Debug.Log("[JUDGMENT] 🎉 Slideshow selesai! Semua tong sudah protes!");
+        
+        // Cleanup icon terakhir
+        ClearSpawnedIcons();
+        
+        // Cek apakah pakai transisi outro atau langsung Win Panel
+        if (useOutroTransition && panelTransisiOverlay != null && textTransisiInfo != null)
+        {
+            Debug.Log("[JUDGMENT] 🎬 Memulai transisi outro ke Win Panel...");
+            yield return StartCoroutine(TransitionOutroCoroutine());
+        }
+        else
+        {
+            Debug.Log("[JUDGMENT] ⏩ Langsung ke Win Panel tanpa transisi outro");
+        }
         
         // Sembunyikan panel
         if (judgmentPanel != null)
@@ -201,23 +527,37 @@ public class JudgmentSlideshow : MonoBehaviour
             wasteNames += wrongWastes[i].namaSampah;
             if (i < maxNamesShown - 1)
             {
-                wasteNames += \", \";
+                wasteNames += ", ";
             }
         }
         
         // Tambah "dan lainnya" jika lebih dari 3
         if (wrongWastes.Count > 3)
         {
-            wasteNames += $\" dan {wrongWastes.Count - 3} lainnya\";\n        }
+            wasteNames += $" dan {wrongWastes.Count - 3} lainnya";
+        }
         
         // Dialog template berdasarkan tipe tong (dengan personality berbeda)
         switch (binType)
         {
             case WasteType.Organik:
-                return $\"Aduh! Aku Tong Hijau untuk sampah organik!\\n\\n\" +\n                       $\"Kok {wasteNames} dimasukkan ke sini? 😢\\n\\n\" +\n                       $\"Sampah organik itu yang berasal dari makhluk hidup dan bisa membusuk, seperti sisa makanan!\";\n            \n            case WasteType.Anorganik:
-                return $\"Hei! Aku Tong Kuning untuk sampah anorganik!\\n\\n\" +\n                       $\"Masa {wasteNames} masuk ke sini sih? 😠\\n\\n\" +\n                       $\"Sampah anorganik itu seperti plastik, kertas, dan kaleng yang bisa didaur ulang!\";\n            \n            case WasteType.B3:
-                return $\"AWAS! Aku Tong Merah khusus B3 (Bahan Berbahaya)!\\n\\n\" +\n                       $\"{wasteNames} bukan sampah berbahaya! 😤\\n\\n\" +\n                       $\"B3 itu seperti baterai, lampu, dan obat-obatan yang bisa meracuni lingkungan!\";\n            \n            default:
-                return \"Aku bingung... Sampah ini salah tempat deh! 🤔\";\n        }
+                return $"Aduh! Aku Tong Hijau untuk sampah organik!\n\n" +
+                       $"Kok {wasteNames} dimasukkan ke sini? 😢\n\n" +
+                       $"Sampah organik itu yang berasal dari makhluk hidup dan bisa membusuk, seperti sisa makanan!";
+            
+            case WasteType.Anorganik:
+                return $"Hei! Aku Tong Kuning untuk sampah anorganik!\n\n" +
+                       $"Masa {wasteNames} masuk ke sini sih? 😠\n\n" +
+                       $"Sampah anorganik itu seperti plastik, kertas, dan kaleng yang bisa didaur ulang!";
+            
+            case WasteType.B3:
+                return $"AWAS! Aku Tong Merah khusus B3 (Bahan Berbahaya)!\n\n" +
+                       $"{wasteNames} bukan sampah berbahaya! 😤\n\n" +
+                       $"B3 itu seperti baterai, lampu, dan obat-obatan yang bisa meracuni lingkungan!";
+            
+            default:
+                return "Aku bingung... Sampah ini salah tempat deh! 🤔";
+        }
     }
     
     /// <summary>
@@ -228,22 +568,22 @@ public class JudgmentSlideshow : MonoBehaviour
     {
         if (containerWasteIcons == null)
         {
-            Debug.LogError(\"[JUDGMENT] containerWasteIcons NULL! Tidak bisa spawn icon.\");
+            Debug.LogError("[JUDGMENT] containerWasteIcons NULL! Tidak bisa spawn icon.");
             return;
         }
         
         if (prefabWasteIcon == null)
         {
-            Debug.LogError(\"[JUDGMENT] prefabWasteIcon NULL! Assign prefab di Inspector.\");
+            Debug.LogError("[JUDGMENT] prefabWasteIcon NULL! Assign prefab di Inspector.");
             return;
         }
         
         // Cleanup icon lama (jika ada)
         ClearSpawnedIcons();
         
-        Debug.Log($\"[JUDGMENT] Spawn {wrongWastes.Count} icon sampah dengan efek menumpuk...\");
+        Debug.Log($"[JUDGMENT] Spawn {wrongWastes.Count} icon sampah dengan animasi...");
         
-        // Spawn setiap icon sampah
+        // Spawn setiap icon sampah dengan animasi berurutan
         for (int i = 0; i < wrongWastes.Count; i++)
         {
             WasteData waste = wrongWastes[i];
@@ -259,7 +599,7 @@ public class JudgmentSlideshow : MonoBehaviour
                 iconImage.sprite = waste.iconSampah;
             }
             
-            // Set size
+            // Set size & position
             RectTransform rt = iconObj.GetComponent<RectTransform>();
             if (rt != null)
             {
@@ -268,14 +608,133 @@ public class JudgmentSlideshow : MonoBehaviour
                 // Random offset untuk efek menumpuk berserakan (tidak kaku)
                 float offsetX = Random.Range(-randomOffsetRange, randomOffsetRange);
                 float offsetY = Random.Range(-randomOffsetRange, randomOffsetRange);
-                rt.anchoredPosition = new Vector2(offsetX, offsetY);
+                
+                // Posisi akhir = base position + random offset
+                Vector2 finalPosition = baseIconPosition + new Vector2(offsetX, offsetY);
                 
                 // Random rotation untuk efek lebih natural
                 float rotation = Random.Range(-randomRotationRange, randomRotationRange);
-                rt.rotation = Quaternion.Euler(0, 0, rotation);
+                
+                // Mulai animasi spawn dengan delay berurutan
+                StartCoroutine(AnimateIconSpawn(iconObj, rt, iconImage, finalPosition, rotation, i * iconSpawnDelay));
             }
             
-            Debug.Log($\"[JUDGMENT]   - Spawn icon: {waste.namaSampah} (offset: {rt.anchoredPosition}, rotation: {rt.rotation.eulerAngles.z}°)\");
+            Debug.Log($"[JUDGMENT]   - Spawn icon: {waste.namaSampah} dengan animasi (delay: {i * iconSpawnDelay}s)");
+        }
+    }
+    
+    /// <summary>
+    /// Animasi spawn untuk icon sampah (Scale + Fade + Drop)
+    /// </summary>
+    IEnumerator AnimateIconSpawn(GameObject iconObj, RectTransform rt, Image iconImage, Vector2 finalPosition, float finalRotation, float delay)
+    {
+        // Tunggu delay (untuk efek berurutan)
+        yield return new WaitForSecondsRealtime(delay);
+        
+        // Setup kondisi awal animasi
+        Vector2 startPosition = finalPosition;
+        
+        if (useScaleAnimation)
+        {
+            rt.localScale = Vector3.zero; // Mulai dari kecil
+        }
+        
+        if (useFadeAnimation && iconImage != null)
+        {
+            Color startColor = iconImage.color;
+            startColor.a = 0f; // Mulai transparan
+            iconImage.color = startColor;
+        }
+        
+        if (useDropAnimation)
+        {
+            startPosition = finalPosition + new Vector2(0, 100f); // Mulai dari atas
+        }
+        
+        rt.anchoredPosition = startPosition;
+        
+        // Animasi dengan lerp
+        float elapsed = 0f;
+        
+        while (elapsed < iconSpawnDuration)
+        {
+            elapsed += Time.unscaledDeltaTime; // Gunakan unscaled agar tidak terpengaruh Time.timeScale
+            float t = elapsed / iconSpawnDuration;
+            
+            // Smooth easing (ease out cubic)
+            float easedT = 1f - Mathf.Pow(1f - t, 3f);
+            
+            // Scale animation
+            if (useScaleAnimation)
+            {
+                rt.localScale = Vector3.Lerp(Vector3.zero, Vector3.one, easedT);
+            }
+            
+            // Fade animation
+            if (useFadeAnimation && iconImage != null)
+            {
+                Color currentColor = iconImage.color;
+                currentColor.a = Mathf.Lerp(0f, 1f, easedT);
+                iconImage.color = currentColor;
+            }
+            
+            // Drop animation
+            if (useDropAnimation)
+            {
+                rt.anchoredPosition = Vector2.Lerp(startPosition, finalPosition, easedT);
+            }
+            
+            // Rotation (smooth dari 0 ke final rotation)
+            rt.rotation = Quaternion.Euler(0, 0, Mathf.Lerp(0f, finalRotation, easedT));
+            
+            yield return null;
+        }
+        
+        // Pastikan nilai akhir tepat
+        rt.localScale = Vector3.one;
+        rt.anchoredPosition = finalPosition;
+        rt.rotation = Quaternion.Euler(0, 0, finalRotation);
+        
+        if (iconImage != null)
+        {
+            Color finalColor = iconImage.color;
+            finalColor.a = 1f;
+            iconImage.color = finalColor;
+        }
+        
+        // Mulai animasi melayang setelah spawn selesai
+        if (useFloatingAnimation && iconObj != null)
+        {
+            StartCoroutine(FloatingAnimation(rt, finalPosition, finalRotation));
+        }
+    }
+    
+    /// <summary>
+    /// Animasi melayang tipis (idle animation) untuk icon sampah
+    /// </summary>
+    IEnumerator FloatingAnimation(RectTransform rt, Vector2 basePosition, float baseRotation)
+    {
+        if (rt == null) yield break;
+        
+        // Random offset untuk setiap icon biar tidak sinkron semua
+        float randomOffset = Random.Range(0f, Mathf.PI * 2f);
+        
+        while (rt != null && rt.gameObject.activeInHierarchy)
+        {
+            float time = Time.unscaledTime * floatingSpeed + randomOffset;
+            
+            // Gerakan melayang pakai sine wave (naik-turun halus) - LEBIH KECIL
+            float offsetY = Mathf.Sin(time) * floatingDistance;
+            float offsetX = Mathf.Cos(time * 0.8f) * (floatingDistance * 0.3f); // Horizontal lebih halus
+            
+            // Update posisi dengan offset melayang
+            rt.anchoredPosition = basePosition + new Vector2(offsetX, offsetY);
+            
+            // Rotasi sedikit mengikuti gerakan (untuk efek lebih natural) - DIKURANGI
+            float rotationOffset = Mathf.Sin(time * 1.5f) * 1.5f; // Max ±1.5 derajat (lebih halus)
+            rt.rotation = Quaternion.Euler(0, 0, baseRotation + rotationOffset);
+            
+            yield return null;
         }
     }
     

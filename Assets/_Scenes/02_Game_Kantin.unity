@@ -2684,9 +2684,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelPakaiTimer: 0
-  totalSampahLevelIni: 14
+  totalSampahLevelIni: 12
   indexLevelSaatIni: 0
   winPanel: {fileID: 715404642}
+  losePanel: {fileID: 0}
   textSkorAkhir: {fileID: 0}
   textWaktuAkhir: {fileID: 0}
   scoreTextUI: {fileID: 0}
@@ -2752,6 +2753,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bca13e81c5901fd409d58b35a84c02e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  briefingScript: {fileID: 0}
   panelSelesai: {fileID: 715404642}
   dataLevelIni: {fileID: 11400000, guid: 268d62b9f2b5ead4ea06a2b5b851672e, type: 2}
   urutanLevel: 1
